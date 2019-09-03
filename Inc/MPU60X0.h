@@ -36,12 +36,24 @@
 #include <utility>
 
 extern "C" {
-#include "main.h"                // NOLINT
+#include "main.h"  // NOLINT
+
+#ifdef STM32F7
 #include "stm32f7xx_hal.h"       // NOLINT
 #include "stm32f7xx_hal_i2c.h"   // NOLINT
 #include "stm32f7xx_hal_uart.h"  // NOLINT
+#else
+#ifdef STM32F4
+#include "stm32f4xx_hal.h"       // NOLINT
+#include "stm32f4xx_hal_i2c.h"   // NOLINT
+#include "stm32f4xx_hal_uart.h"  // NOLINT
+#else
+#ifdef STM32F3
+#include "stm32f3xx_hal.h"       // NOLINT
+#include "stm32f3xx_hal_i2c.h"   // NOLINT
+#include "stm32f3xx_hal_uart.h"  // NOLINT
+#endif
 }
-;
 
 #include "bit_definitions.h"  // NOLINT
 #include "data_types.h"       // NOLINT
@@ -2021,4 +2033,4 @@ public:
 	 **/
 };
 }  // namespace mpu60X0
-#endif  // DRIVERS_MPU60X0_MPU60X0_H_
+#endif                        // DRIVERS_MPU60X0_MPU60X0_H_
