@@ -24,8 +24,7 @@ STM32Fx HAL UART Driver (Debugging)
 
 ## Installation
 
-Copy the header files to your **Inc** directory
-and the source files to your **Src** directory
+Copy the header files to your Inc directory
 
 
 
@@ -36,7 +35,7 @@ and the source files to your **Src** directory
 We utilize bit fields, Clang doesn't raise warnings about the bit field sizes being unable to fit with the byte data struct representations, gcc however raises the warning, This is not a problem at the compilation phase unless you use a flag such as -Werror that points it out as an error.
 
 
-##Contributing
+## Contributing
 We employ the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) and  [Nest's embedded c++ styles](https://github.com/openthread/openthread/blob/master/STYLE_GUIDE.md)
 However in contrast to [Nest's embedded c++ styles](https://github.com/openthread/openthread/blob/master/STYLE_GUIDE.md), We:
 	- utilize modern C++ STL abstractions such as [std::pair](https://en.cppreference.com/w/cpp/utility/pair)
