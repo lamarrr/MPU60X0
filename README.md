@@ -1,2 +1,1 @@
-# MPU60X0
-Fast, Lightweight STM32 I2C HAL Driver for the MPU6000/MPU6050 IMU
+### Blocking mode api that takes advantage of burst reads and bit field packing
