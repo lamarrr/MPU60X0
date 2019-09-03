@@ -38,8 +38,9 @@ We utilize bit fields, Clang doesn't raise warnings about the bit field sizes be
 ## Contributing
 We employ the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) and  [Nest's embedded c++ styles](https://github.com/openthread/openthread/blob/master/STYLE_GUIDE.md)
 However in contrast to [Nest's embedded c++ styles](https://github.com/openthread/openthread/blob/master/STYLE_GUIDE.md), We:
-	- utilize modern C++ STL abstractions such as [std::pair](https://en.cppreference.com/w/cpp/utility/pair)
-	- [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration) to represent discrete time intervals for timeouts
+
+- utilize modern C++ STL abstractions such as [std::pair](https://en.cppreference.com/w/cpp/utility/pair)
+- utilize [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration) to represent discretized time intervals for timeouts
 
 ## License
 [MIT License](assets/LICENSE)
