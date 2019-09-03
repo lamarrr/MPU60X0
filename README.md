@@ -24,7 +24,8 @@ STM32Fx HAL UART Driver (Debugging)
 
 ## Installation
 
-Copy the header files to your Inc directory
+Copy the header files to your **Inc** directory
+and the source files to your **Src** directory
 
 
 
