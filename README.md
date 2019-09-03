@@ -18,8 +18,8 @@ TBD
 
 ## Dependencies
 
-STM32Fx HAL I2C driver
-STM32Fx HAL UART Driver (Debugging)
+- STM32Fx HAL I2C driver
+- STM32Fx HAL UART Driver (Debugging)
 
 
 ## Installation
