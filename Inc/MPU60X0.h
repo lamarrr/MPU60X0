@@ -93,8 +93,8 @@ struct MPU60X0 {
     handle_ = nullptr;
   }
 
-  inline Status WriteByte_(register_type reg, uint8_t data,
-                           duration_type timeout) noexcept {
+  Status WriteByte_(register_type reg, uint8_t data,
+                    duration_type timeout) noexcept {
     uint8_t buffer[2] = {reg, data};
     return static_cast<Status>(HAL_I2C_Master_Transmit(
         handle_, device_address_, buffer, sizeof(buffer), timeout.count()));
@@ -110,8 +110,8 @@ struct MPU60X0 {
    * @returns Status:
    */
   template <typename ByteRep>
-  inline Status WriteByteAs_(register_type reg, ByteRep b_rep,
-                             duration_type timeout) noexcept {
+  Status WriteByteAs_(register_type reg, ByteRep b_rep,
+                      duration_type timeout) noexcept {
     static_assert(sizeof(ByteRep) == 1U, "Type must be byte sized");
     uint8_t value = reinterpret_cast<uint8_t&>(b_rep);
     printf("[WriteByteAs_] Sending value: %u\n", value);
@@ -127,15 +127,15 @@ struct MPU60X0 {
    * @parameter timeout:
    * @returns Status:
    */
-  inline Status BurstWrite_(register_type reg, const uint8_t* data,
-                            uint16_t size, duration_type timeout) noexcept {
+  Status BurstWrite_(register_type reg, const uint8_t* data, uint16_t size,
+                     duration_type timeout) noexcept {
     return static_cast<Status>(HAL_I2C_Master_Transmit(
         handle_, device_address_, const_cast<uint8_t*>(data), size,
         timeout.count()));
   }
 
-  inline std::pair<Status, uint8_t> ReadByte_(register_type reg,
-                                              duration_type timeout) noexcept {
+  std::pair<Status, uint8_t> ReadByte_(register_type reg,
+                                       duration_type timeout) noexcept {
     uint8_t data{};
     Status status = static_cast<Status>(HAL_I2C_Master_Transmit(
         handle_, device_address_, &reg, 1, timeout.count()));
@@ -146,8 +146,8 @@ struct MPU60X0 {
   }
 
   template <typename ByteRep>
-  inline std::pair<Status, ByteRep> ReadByteAs_(
-      register_type reg, duration_type timeout) noexcept {
+  std::pair<Status, ByteRep> ReadByteAs_(register_type reg,
+                                         duration_type timeout) noexcept {
     static_assert(sizeof(ByteRep) == 1U, "Type must be byte sized");
     std::pair<Status, uint8_t> data = ReadByte_(reg, timeout);
     ByteRep res{};
@@ -156,8 +156,8 @@ struct MPU60X0 {
     return std::make_pair(data.first, res);
   }
 
-  inline Status BurstRead_(register_type reg, uint8_t* data, uint16_t size,
-                           duration_type timeout) noexcept {
+  Status BurstRead_(register_type reg, uint8_t* data, uint16_t size,
+                    duration_type timeout) noexcept {
     Status status = static_cast<Status>(HAL_I2C_Master_Transmit(
         handle_, device_address_, &reg, 1, timeout.count()));
     if (status != Status::OK) return status;
@@ -166,14 +166,14 @@ struct MPU60X0 {
     return status;
   }
 
-  inline bool Ready(uint32_t trials, duration_type timeout) noexcept {
+  bool Ready(uint32_t trials, duration_type timeout) noexcept {
     return HAL_I2C_IsDeviceReady(handle_, device_address_, trials,
                                  timeout.count()) == HAL_OK;
   }
 
   // that the device be configured to use one of the gyroscopes (or an external
   // clock source) as the clock reference for improved stability
-  inline Status Initialize() {
+  Status Initialize() {
     PowerManagement1_Config cfg{};
     cfg.clock_source = ClockSource::PllGyro_X;
     cfg.reset_registers = true;
@@ -186,57 +186,53 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteSelfTestX(uint8_t data, duration_type timeout) noexcept {
+  Status WriteSelfTestX(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::SelfTestX, data, timeout);
   }
 
-  inline std::pair<Status, uint8_t> ReadSelfTestX(
-      duration_type timeout) noexcept {
+  std::pair<Status, uint8_t> ReadSelfTestX(duration_type timeout) noexcept {
     return ReadByte_(register_map::SelfTestX, timeout);
   }
 
-  inline Status WriteSelfTestY(uint8_t data, duration_type timeout) noexcept {
+  Status WriteSelfTestY(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::SelfTestY, data, timeout);
   }
 
-  inline std::pair<Status, uint8_t> ReadSelfTestY(
-      duration_type timeout) noexcept {
+  std::pair<Status, uint8_t> ReadSelfTestY(duration_type timeout) noexcept {
     return ReadByte_(register_map::SelfTestY, timeout);
   }
 
-  inline Status WriteSelfTestZ(uint8_t data, duration_type timeout) noexcept {
+  Status WriteSelfTestZ(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::SelfTestZ, data, timeout);
   }
 
-  inline std::pair<Status, uint8_t> ReadSelfTestZ(
-      duration_type timeout) noexcept {
+  std::pair<Status, uint8_t> ReadSelfTestZ(duration_type timeout) noexcept {
     return ReadByte_(register_map::SelfTestZ, timeout);
   }
 
-  inline Status WriteSelfTestA(uint8_t data, duration_type timeout) noexcept {
+  Status WriteSelfTestA(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::SelfTestA, data, timeout);
   }
 
-  inline std::pair<Status, uint8_t> ReadSelfTestA(
-      duration_type timeout) noexcept {
+  std::pair<Status, uint8_t> ReadSelfTestA(duration_type timeout) noexcept {
     return ReadByte_(register_map::SelfTestA, timeout);
   }
 
-  inline std::pair<Status, uint8_t> GetGyroscopeX_SelfTestValue(
+  std::pair<Status, uint8_t> GetGyroscopeX_SelfTestValue(
       duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res = ReadSelfTestX(timeout);
     res.second &= 00011111U;
     return res;
   }
 
-  inline std::pair<Status, uint8_t> GetGyroscopeY_SelfTestValue(
+  std::pair<Status, uint8_t> GetGyroscopeY_SelfTestValue(
       duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res = ReadSelfTestY(timeout);
     res.second &= 00011111U;
     return res;
   }
 
-  inline std::pair<Status, uint8_t> GetGyroscopeZ_SelfTestValue(
+  std::pair<Status, uint8_t> GetGyroscopeZ_SelfTestValue(
       duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res = ReadSelfTestZ(timeout);
     res.second &= 00011111U;
@@ -244,7 +240,7 @@ struct MPU60X0 {
   }
 
   // 5 bit precision
-  inline std::pair<Status, uint8_t> GetAccelerometerX_SelfTestValue(
+  std::pair<Status, uint8_t> GetAccelerometerX_SelfTestValue(
       duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res_head = ReadSelfTestX(timeout);
     if (res_head.first != Status::OK) return res_head;
@@ -254,7 +250,7 @@ struct MPU60X0 {
     return res_tail;
   }
 
-  inline std::pair<Status, uint8_t> GetAccelerometerY_SelfTestValue(
+  std::pair<Status, uint8_t> GetAccelerometerY_SelfTestValue(
       duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res_head = ReadSelfTestY(timeout);
     if (res_head.first != Status::OK) return res_head;
@@ -264,7 +260,7 @@ struct MPU60X0 {
     return res_tail;
   }
 
-  inline std::pair<Status, uint8_t> GetAccelerometerZ_SelfTestValue(
+  std::pair<Status, uint8_t> GetAccelerometerZ_SelfTestValue(
       duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res_head = ReadSelfTestZ(timeout);
     if (res_head.first != Status::OK) return res_head;
@@ -274,8 +270,8 @@ struct MPU60X0 {
     return res_tail;
   }
 
-  inline Status SetGyroscopeX_SelfTestValue(uint8_t data,
-                                            duration_type timeout) noexcept {
+  Status SetGyroscopeX_SelfTestValue(uint8_t data,
+                                     duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res = ReadSelfTestX(timeout);
 
     if (res.first != Status::OK) return res.first;
@@ -285,8 +281,8 @@ struct MPU60X0 {
     return WriteSelfTestX(res.second, timeout);
   }
 
-  inline Status SetGyroscopeY_SelfTestValue(uint8_t data,
-                                            duration_type timeout) noexcept {
+  Status SetGyroscopeY_SelfTestValue(uint8_t data,
+                                     duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res = ReadSelfTestY(timeout);
 
     if (res.first != Status::OK) return res.first;
@@ -296,8 +292,8 @@ struct MPU60X0 {
     return WriteSelfTestY(res.second, timeout);
   }
 
-  inline Status SetGyroscopeZ_SelfTestValue(uint8_t data,
-                                            duration_type timeout) noexcept {
+  Status SetGyroscopeZ_SelfTestValue(uint8_t data,
+                                     duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res = ReadSelfTestZ(timeout);
 
     if (res.first != Status::OK) return res.first;
@@ -314,8 +310,8 @@ struct MPU60X0 {
    * @parameter timeout:
    * @returns Status:
    */
-  inline Status SetAccelerometerX_SelfTestValue(
-      uint8_t data, duration_type timeout) noexcept {
+  Status SetAccelerometerX_SelfTestValue(uint8_t data,
+                                         duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res_head = ReadSelfTestX(timeout);
 
     if (res_head.first != Status::OK) return res_head.first;
@@ -336,8 +332,8 @@ struct MPU60X0 {
     return WriteSelfTestA(res_head.second, timeout);
   }
 
-  inline Status SetAccelerometerY_SelfTestValue(
-      uint8_t data, duration_type timeout) noexcept {
+  Status SetAccelerometerY_SelfTestValue(uint8_t data,
+                                         duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res_head = ReadSelfTestY(timeout);
 
     if (res_head.first != Status::OK) return res_head.first;
@@ -358,8 +354,8 @@ struct MPU60X0 {
     return WriteSelfTestA(res_head.second, timeout);
   }
 
-  inline Status SetAccelerometerZ_SelfTestValue(
-      uint8_t data, duration_type timeout) noexcept {
+  Status SetAccelerometerZ_SelfTestValue(uint8_t data,
+                                         duration_type timeout) noexcept {
     std::pair<Status, uint8_t> res_head = ReadSelfTestZ(timeout);
 
     if (res_head.first != Status::OK) return res_head.first;
@@ -384,12 +380,11 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteSampleRateDivider(uint8_t data,
-                                       duration_type timeout) noexcept {
+  Status WriteSampleRateDivider(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::SampleRateDivider, data, timeout);
   }
 
-  inline std::pair<Status, uint8_t> ReadSampleRateDivider(
+  std::pair<Status, uint8_t> ReadSampleRateDivider(
       duration_type timeout) noexcept {
     return ReadByte_(register_map::SampleRateDivider, timeout);
   }
@@ -398,16 +393,15 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteConfig(Config config, duration_type timeout) noexcept {
+  Status WriteConfig(Config config, duration_type timeout) noexcept {
     return WriteByteAs_<Config>(register_map::Config, config, timeout);
   }
 
-  inline std::pair<Status, Config> ReadConfig(duration_type timeout) noexcept {
+  std::pair<Status, Config> ReadConfig(duration_type timeout) noexcept {
     return ReadByteAs_<Config>(register_map::Config, timeout);
   }
 
-  inline Status SetExternalFrameSync(FrameSync fsync,
-                                     duration_type timeout) noexcept {
+  Status SetExternalFrameSync(FrameSync fsync, duration_type timeout) noexcept {
     //
     std::pair<Status, Config> conf = ReadConfig(timeout);
 
@@ -419,8 +413,7 @@ struct MPU60X0 {
     return WriteConfig(conf.second, timeout);
   }
 
-  inline Status SetDlpfConfig(DlpfConfig dlpf_cfg,
-                              duration_type timeout) noexcept {
+  Status SetDlpfConfig(DlpfConfig dlpf_cfg, duration_type timeout) noexcept {
     std::pair<Status, Config> conf = ReadConfig(timeout);
 
     if (conf.first != Status::OK) return conf.first;
@@ -431,15 +424,14 @@ struct MPU60X0 {
     return WriteConfig(conf.second, timeout);
   }
 
-  inline std::pair<Status, FrameSync> GetExternalFrameSync(
+  std::pair<Status, FrameSync> GetExternalFrameSync(
       duration_type timeout) noexcept {
     std::pair<Status, Config> conf = ReadConfig(timeout);
 
     return std::make_pair(conf.first, FrameSync{conf.second.ext_frame_sync});
   }
 
-  inline std::pair<Status, DlpfConfig> GetDlpfConfig(
-      duration_type timeout) noexcept {
+  std::pair<Status, DlpfConfig> GetDlpfConfig(duration_type timeout) noexcept {
     std::pair<Status, Config> conf = ReadConfig(timeout);
 
     return std::make_pair(conf.first, DlpfConfig{conf.second.dlpf_config});
@@ -450,18 +442,18 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteGyroscopeConfig(GyroscopeConfig gyro_cfg,
-                                     duration_type timeout) noexcept {
+  Status WriteGyroscopeConfig(GyroscopeConfig gyro_cfg,
+                              duration_type timeout) noexcept {
     return WriteByteAs_(register_map::GyroscopeConfig, gyro_cfg, timeout);
   }
 
-  inline std::pair<Status, GyroscopeConfig> ReadGyroscopeConfig(
+  std::pair<Status, GyroscopeConfig> ReadGyroscopeConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
   }
 
-  inline Status SetGyroscopeX_SelfTestState(bool activate,
-                                            duration_type timeout) noexcept {
+  Status SetGyroscopeX_SelfTestState(bool activate,
+                                     duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
 
@@ -473,8 +465,8 @@ struct MPU60X0 {
                                          res.second, timeout);
   }
 
-  inline Status SetGyroscopeY_SelfTestState(bool activate,
-                                            duration_type timeout) noexcept {
+  Status SetGyroscopeY_SelfTestState(bool activate,
+                                     duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
 
@@ -486,8 +478,8 @@ struct MPU60X0 {
                                          res.second, timeout);
   }
 
-  inline Status SetGyroscopeZ_SelfTestState(bool activate,
-                                            duration_type timeout) noexcept {
+  Status SetGyroscopeZ_SelfTestState(bool activate,
+                                     duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
 
@@ -500,8 +492,8 @@ struct MPU60X0 {
   }
 
   // 3 bit, x, y, z
-  inline Status SetGyroscopeSelfTestStates(uint8_t tri_state,
-                                           duration_type timeout) noexcept {
+  Status SetGyroscopeSelfTestStates(uint8_t tri_state,
+                                    duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
 
@@ -515,8 +507,8 @@ struct MPU60X0 {
                                          res.second, timeout);
   }
 
-  inline Status SetGyroscopeFullScaleRange(GyroscopeFullScale full_scale,
-                                           duration_type timeout) noexcept {
+  Status SetGyroscopeFullScaleRange(GyroscopeFullScale full_scale,
+                                    duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
 
@@ -528,7 +520,7 @@ struct MPU60X0 {
                                          res.second, timeout);
   }
 
-  inline std::pair<Status, bool> GetGyroscopeX_SelfTestState(
+  std::pair<Status, bool> GetGyroscopeX_SelfTestState(
       duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
@@ -536,7 +528,7 @@ struct MPU60X0 {
     return std::make_pair(res.first, bool{res.second.x_self_test});
   }
 
-  inline std::pair<Status, bool> GetGyroscopeY_SelfTestState(
+  std::pair<Status, bool> GetGyroscopeY_SelfTestState(
       duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
@@ -544,7 +536,7 @@ struct MPU60X0 {
     return std::make_pair(res.first, bool{res.second.y_self_test});
   }
 
-  inline std::pair<Status, bool> GetGyroscopeZ_SelfTestState(
+  std::pair<Status, bool> GetGyroscopeZ_SelfTestState(
       duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
@@ -553,7 +545,7 @@ struct MPU60X0 {
   }
 
   // first bit, second bit, third bit
-  inline std::pair<Status, uint8_t> GetGyroscopeSelfTestStates(
+  std::pair<Status, uint8_t> GetGyroscopeSelfTestStates(
       duration_type timeout) noexcept {
     uint8_t data{};
 
@@ -568,7 +560,7 @@ struct MPU60X0 {
     return std::make_pair(res.first, data);
   }
 
-  inline std::pair<Status, GyroscopeFullScale> GetGyroscopeFullScaleRange(
+  std::pair<Status, GyroscopeFullScale> GetGyroscopeFullScaleRange(
       duration_type timeout) noexcept {
     std::pair<Status, GyroscopeConfig> res =
         ReadByteAs_<GyroscopeConfig>(register_map::GyroscopeConfig, timeout);
@@ -581,20 +573,20 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteAccelerometerConfig(AccelerometerConfig acc_cfg,
-                                         duration_type timeout) noexcept {
+  Status WriteAccelerometerConfig(AccelerometerConfig acc_cfg,
+                                  duration_type timeout) noexcept {
     return WriteByteAs_<AccelerometerConfig>(register_map::AccelerometerConfig,
                                              acc_cfg, timeout);
   }
 
-  inline std::pair<Status, AccelerometerConfig> ReadAccelerometerConfig(
+  std::pair<Status, AccelerometerConfig> ReadAccelerometerConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<AccelerometerConfig>(register_map::AccelerometerConfig,
                                             timeout);
   }
 
-  inline Status SetAccelerometerX_SelfTestState(
-      bool activate, duration_type timeout) noexcept {
+  Status SetAccelerometerX_SelfTestState(bool activate,
+                                         duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> acc_cfg =
         ReadAccelerometerConfig(timeout);
 
@@ -606,8 +598,8 @@ struct MPU60X0 {
                                              acc_cfg.second, timeout);
   }
 
-  inline Status SetAccelerometerY_SelfTestState(
-      bool activate, duration_type timeout) noexcept {
+  Status SetAccelerometerY_SelfTestState(bool activate,
+                                         duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> acc_cfg =
         ReadAccelerometerConfig(timeout);
 
@@ -619,8 +611,8 @@ struct MPU60X0 {
                                              acc_cfg.second, timeout);
   }
 
-  inline Status SetAccelerometerZ_SelfTestState(
-      bool activate, duration_type timeout) noexcept {
+  Status SetAccelerometerZ_SelfTestState(bool activate,
+                                         duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> acc_cfg =
         ReadAccelerometerConfig(timeout);
 
@@ -632,8 +624,8 @@ struct MPU60X0 {
                                              acc_cfg.second, timeout);
   }
 
-  inline Status SetAccelerometerSelfTestStates(uint8_t tri_state,
-                                               duration_type timeout) noexcept {
+  Status SetAccelerometerSelfTestStates(uint8_t tri_state,
+                                        duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> res =
         ReadByteAs_<AccelerometerConfig>(register_map::AccelerometerConfig,
                                          timeout);
@@ -648,8 +640,8 @@ struct MPU60X0 {
                                              res.second, timeout);
   }
 
-  inline Status SetAccelerometerFullScaleRange(
-      AccelerometerFullScale full_scale, duration_type timeout) noexcept {
+  Status SetAccelerometerFullScaleRange(AccelerometerFullScale full_scale,
+                                        duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> res =
         ReadByteAs_<AccelerometerConfig>(register_map::AccelerometerConfig,
                                          timeout);
@@ -662,7 +654,7 @@ struct MPU60X0 {
                                              res.second, timeout);
   }
 
-  inline std::pair<Status, bool> GetAccelerometerX_SelfTestState(
+  std::pair<Status, bool> GetAccelerometerX_SelfTestState(
       duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> res =
         ReadByteAs_<AccelerometerConfig>(register_map::GyroscopeConfig,
@@ -671,7 +663,7 @@ struct MPU60X0 {
     return std::make_pair(res.first, bool{res.second.x_self_test});
   }
 
-  inline std::pair<Status, bool> GetAccelerometerY_SelfTestState(
+  std::pair<Status, bool> GetAccelerometerY_SelfTestState(
       duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> res =
         ReadByteAs_<AccelerometerConfig>(register_map::GyroscopeConfig,
@@ -680,7 +672,7 @@ struct MPU60X0 {
     return std::make_pair(res.first, bool{res.second.y_self_test});
   }
 
-  inline std::pair<Status, bool> GetAccelerometerZ_SelfTestState(
+  std::pair<Status, bool> GetAccelerometerZ_SelfTestState(
       duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> res =
         ReadByteAs_<AccelerometerConfig>(register_map::GyroscopeConfig,
@@ -689,7 +681,7 @@ struct MPU60X0 {
     return std::make_pair(res.first, bool{res.second.z_self_test});
   }
 
-  inline std::pair<Status, uint8_t> GetAccelerometerSelfTestStates(
+  std::pair<Status, uint8_t> GetAccelerometerSelfTestStates(
       duration_type timeout) noexcept {
     uint8_t data{};
 
@@ -705,8 +697,8 @@ struct MPU60X0 {
     return std::make_pair(res.first, data);
   }
 
-  inline std::pair<Status, AccelerometerFullScale>
-  GetAccelerometerFullScaleRange(duration_type timeout) noexcept {
+  std::pair<Status, AccelerometerFullScale> GetAccelerometerFullScaleRange(
+      duration_type timeout) noexcept {
     std::pair<Status, AccelerometerConfig> res =
         ReadAccelerometerConfig(timeout);
     return std::make_pair(res.first,
@@ -718,13 +710,13 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteFreeFallAccelerationThreshold(
-      uint8_t acc_thresh, duration_type timeout) noexcept {
+  Status WriteFreeFallAccelerationThreshold(uint8_t acc_thresh,
+                                            duration_type timeout) noexcept {
     return WriteByte_(register_map::FreeFallAccelerationThreshold, acc_thresh,
                       timeout);
   }
 
-  inline std::pair<Status, uint8_t> ReadFreeFallAccelerationThreshold(
+  std::pair<Status, uint8_t> ReadFreeFallAccelerationThreshold(
       duration_type timeout) noexcept {
     return ReadByte_(register_map::FreeFallAccelerationThreshold, timeout);
   }
@@ -734,12 +726,11 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteFreeFallDuration(uint8_t ff_dur,
-                                      duration_type timeout) noexcept {
+  Status WriteFreeFallDuration(uint8_t ff_dur, duration_type timeout) noexcept {
     return WriteByte_(register_map::FreeFallDuration, ff_dur, timeout);
   }
 
-  inline std::pair<Status, uint8_t> ReadFreeFallDuration(
+  std::pair<Status, uint8_t> ReadFreeFallDuration(
       duration_type timeout) noexcept {
     return ReadByte_(register_map::FreeFallDuration, timeout);
   }
@@ -749,13 +740,13 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteMotionDetectionThreshold(uint8_t mot_det_thresh,
-                                              duration_type timeout) noexcept {
+  Status WriteMotionDetectionThreshold(uint8_t mot_det_thresh,
+                                       duration_type timeout) noexcept {
     return WriteByte_(register_map::MotionDetectionThreshold, mot_det_thresh,
                       timeout);
   }
 
-  inline std::pair<Status, uint8_t> ReadMotionDetectionThreshold(
+  std::pair<Status, uint8_t> ReadMotionDetectionThreshold(
       duration_type timeout) noexcept {
     return ReadByte_(register_map::MotionDetectionThreshold, timeout);
   }
@@ -765,67 +756,66 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteMotionDetectionDuration(uint8_t mot_det_dur,
-                                             duration_type timeout) noexcept {
-    return WriteByte_(register_map::MotionDetectionDuration, mot_det_dur,
-                      timeout);
-  }
-
-  inline std::pair<Status, uint8_t> ReadMotionDetectionDuration(
-      duration_type timeout) noexcept {
-    return ReadByte_(register_map::MotionDetectionDuration, timeout);
-  }
-
-  /**
-   *
-   *
-   **/
-
-  inline Status WriteZeroMotionDetectionThreshold(
-      uint8_t mot_det_thresh, duration_type timeout) noexcept {
-    return WriteByte_(register_map::MotionDetectionThreshold, mot_det_thresh,
-                      timeout);
-  }
-
-  inline std::pair<Status, uint8_t> ReadZeroMotionDetectionThreshold(
-      duration_type timeout) noexcept {
-    return ReadByte_(register_map::MotionDetectionThreshold, timeout);
-  }
-
-  /**
-   *
-   *
-   **/
-
-  inline Status WriteZeroMotionDetectionDuration(
-      uint8_t mot_det_dur, duration_type timeout) noexcept {
-    return WriteByte_(register_map::MotionDetectionDuration, mot_det_dur,
-                      timeout);
-  }
-
-  inline std::pair<Status, uint8_t> ReadZeroMotionDetectionDuration(
-      duration_type timeout) noexcept {
-    return ReadByte_(register_map::MotionDetectionDuration, timeout);
-  }
-
-  /**
-   *
-   *
-   **/
-
-  inline Status WriteFifoEnableConfig(FifoEnableConfig fifo_en_cfg,
+  Status WriteMotionDetectionDuration(uint8_t mot_det_dur,
                                       duration_type timeout) noexcept {
+    return WriteByte_(register_map::MotionDetectionDuration, mot_det_dur,
+                      timeout);
+  }
+
+  std::pair<Status, uint8_t> ReadMotionDetectionDuration(
+      duration_type timeout) noexcept {
+    return ReadByte_(register_map::MotionDetectionDuration, timeout);
+  }
+
+  /**
+   *
+   *
+   **/
+
+  Status WriteZeroMotionDetectionThreshold(uint8_t mot_det_thresh,
+                                           duration_type timeout) noexcept {
+    return WriteByte_(register_map::MotionDetectionThreshold, mot_det_thresh,
+                      timeout);
+  }
+
+  std::pair<Status, uint8_t> ReadZeroMotionDetectionThreshold(
+      duration_type timeout) noexcept {
+    return ReadByte_(register_map::MotionDetectionThreshold, timeout);
+  }
+
+  /**
+   *
+   *
+   **/
+
+  Status WriteZeroMotionDetectionDuration(uint8_t mot_det_dur,
+                                          duration_type timeout) noexcept {
+    return WriteByte_(register_map::MotionDetectionDuration, mot_det_dur,
+                      timeout);
+  }
+
+  std::pair<Status, uint8_t> ReadZeroMotionDetectionDuration(
+      duration_type timeout) noexcept {
+    return ReadByte_(register_map::MotionDetectionDuration, timeout);
+  }
+
+  /**
+   *
+   *
+   **/
+
+  Status WriteFifoEnableConfig(FifoEnableConfig fifo_en_cfg,
+                               duration_type timeout) noexcept {
     return WriteByteAs_<FifoEnableConfig>(register_map::FifoEnable, fifo_en_cfg,
                                           timeout);
   }
 
-  inline std::pair<Status, FifoEnableConfig> ReadFifoEnableConfig(
+  std::pair<Status, FifoEnableConfig> ReadFifoEnableConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<FifoEnableConfig>(register_map::FifoEnable, timeout);
   }
 
-  inline Status SetTemperatureFifoEnable(bool enable,
-                                         duration_type timeout) noexcept {
+  Status SetTemperatureFifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     if (res.first != Status::OK) return res.first;
 
@@ -834,8 +824,7 @@ struct MPU60X0 {
     return WriteFifoEnableConfig(res.second, timeout);
   }
 
-  inline Status SetGyroscopeX_FifoEnable(bool enable,
-                                         duration_type timeout) noexcept {
+  Status SetGyroscopeX_FifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     if (res.first != Status::OK) return res.first;
 
@@ -844,8 +833,7 @@ struct MPU60X0 {
     return WriteFifoEnableConfig(res.second, timeout);
   }
 
-  inline Status SetGyroscopeY_FifoEnable(bool enable,
-                                         duration_type timeout) noexcept {
+  Status SetGyroscopeY_FifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     if (res.first != Status::OK) return res.first;
 
@@ -854,8 +842,7 @@ struct MPU60X0 {
     return WriteFifoEnableConfig(res.second, timeout);
   }
 
-  inline Status SetGyroscopeZ_FifoEnable(bool enable,
-                                         duration_type timeout) noexcept {
+  Status SetGyroscopeZ_FifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     if (res.first != Status::OK) return res.first;
 
@@ -864,8 +851,8 @@ struct MPU60X0 {
     return WriteFifoEnableConfig(res.second, timeout);
   }
 
-  inline Status SetAccelerometerFifoEnable(bool enable,
-                                           duration_type timeout) noexcept {
+  Status SetAccelerometerFifoEnable(bool enable,
+                                    duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     if (res.first != Status::OK) return res.first;
 
@@ -874,8 +861,7 @@ struct MPU60X0 {
     return WriteFifoEnableConfig(res.second, timeout);
   }
 
-  inline Status SetSlave2_FifoEnable(bool enable,
-                                     duration_type timeout) noexcept {
+  Status SetSlave2_FifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     if (res.first != Status::OK) return res.first;
 
@@ -884,8 +870,7 @@ struct MPU60X0 {
     return WriteFifoEnableConfig(res.second, timeout);
   }
 
-  inline Status SetSlave1_FifoEnable(bool enable,
-                                     duration_type timeout) noexcept {
+  Status SetSlave1_FifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     if (res.first != Status::OK) return res.first;
 
@@ -894,8 +879,7 @@ struct MPU60X0 {
     return WriteFifoEnableConfig(res.second, timeout);
   }
 
-  inline Status SetSlave0_FifoEnable(bool enable,
-                                     duration_type timeout) noexcept {
+  Status SetSlave0_FifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     if (res.first != Status::OK) return res.first;
 
@@ -904,50 +888,47 @@ struct MPU60X0 {
     return WriteFifoEnableConfig(res.second, timeout);
   }
 
-  inline std::pair<Status, bool> GetTemperatureFifoEnable(
+  std::pair<Status, bool> GetTemperatureFifoEnable(
       duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     return std::make_pair(res.first, bool{res.second.enable_temperature_fifo});
   }
 
-  inline std::pair<Status, bool> GetGyroscopeX_FifoEnable(
+  std::pair<Status, bool> GetGyroscopeX_FifoEnable(
       duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     return std::make_pair(res.first, bool{res.second.enable_gyroscope_x_fifo});
   }
 
-  inline std::pair<Status, bool> GetGyroscopeY_FifoEnable(
+  std::pair<Status, bool> GetGyroscopeY_FifoEnable(
       duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     return std::make_pair(res.first, bool{res.second.enable_gyroscope_y_fifo});
   }
 
-  inline std::pair<Status, bool> GetGyroscopeZ_FifoEnable(
+  std::pair<Status, bool> GetGyroscopeZ_FifoEnable(
       duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     return std::make_pair(res.first, bool{res.second.enable_gyroscope_z_fifo});
   }
 
-  inline std::pair<Status, bool> GetAccelerometerFifoEnable(
+  std::pair<Status, bool> GetAccelerometerFifoEnable(
       duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     return std::make_pair(res.first, bool{res.second.enable_acceleration_fifo});
   }
 
-  inline std::pair<Status, bool> GetSlave2_FifoEnable(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetSlave2_FifoEnable(duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     return std::make_pair(res.first, bool{res.second.enable_slave2_fifo});
   }
 
-  inline std::pair<Status, bool> GetSlave1_FifoEnable(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetSlave1_FifoEnable(duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     return std::make_pair(res.first, bool{res.second.enable_slave1_fifo});
   }
 
-  inline std::pair<Status, bool> GetSlave0_FifoEnable(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetSlave0_FifoEnable(duration_type timeout) noexcept {
     std::pair<Status, FifoEnableConfig> res = ReadFifoEnableConfig(timeout);
     return std::make_pair(res.first, bool{res.second.enable_slave0_fifo});
   }
@@ -957,20 +938,19 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteI2cMasterCtrlConfig(I2cMasterCtrlConfig mast_cfg,
-                                         duration_type timeout) noexcept {
+  Status WriteI2cMasterCtrlConfig(I2cMasterCtrlConfig mast_cfg,
+                                  duration_type timeout) noexcept {
     return WriteByteAs_<I2cMasterCtrlConfig>(register_map::I2cMasterCtrl,
                                              mast_cfg, timeout);
   }
 
-  inline std::pair<Status, I2cMasterCtrlConfig> ReadI2cMasterCtrlConfig(
+  std::pair<Status, I2cMasterCtrlConfig> ReadI2cMasterCtrlConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<I2cMasterCtrlConfig>(register_map::I2cMasterCtrl,
                                             timeout);
   }
 
-  inline Status SetMultiMasterEnable(bool enable,
-                                     duration_type timeout) noexcept {
+  Status SetMultiMasterEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
 
@@ -981,8 +961,8 @@ struct MPU60X0 {
   }
 
   // DRI - Data ready Interrupt
-  inline Status SetDRI_AwaitExtSensorData(bool enable,
-                                          duration_type timeout) noexcept {
+  Status SetDRI_AwaitExtSensorData(bool enable,
+                                   duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
 
@@ -992,8 +972,7 @@ struct MPU60X0 {
                                              res.second, timeout);
   }
 
-  inline Status SetSlave3_FifoEnable(bool enable,
-                                     duration_type timeout) noexcept {
+  Status SetSlave3_FifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
 
@@ -1003,8 +982,8 @@ struct MPU60X0 {
                                              res.second, timeout);
   }
 
-  inline Status SetI2cMasterReadWriteTransition(
-      I2cMasterReadWriteTransition rw_trans, duration_type timeout) noexcept {
+  Status SetI2cMasterReadWriteTransition(I2cMasterReadWriteTransition rw_trans,
+                                         duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
 
@@ -1014,8 +993,8 @@ struct MPU60X0 {
     return WriteByteAs_<I2cMasterCtrlConfig>(register_map::I2cMasterCtrl,
                                              res.second, timeout);
   }
-  inline Status SetI2cMasterClockSpeed(I2cMasterClockSpeed clock_speed,
-                                       duration_type timeout) noexcept {
+  Status SetI2cMasterClockSpeed(I2cMasterClockSpeed clock_speed,
+                                duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
 
@@ -1026,15 +1005,14 @@ struct MPU60X0 {
                                              res.second, timeout);
   }
 
-  inline std::pair<Status, bool> GetMultiMasterEnable(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetMultiMasterEnable(duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
 
     return std::make_pair(res.first, bool{res.second.enable_multi_master});
   }
 
-  inline std::pair<Status, bool> GetDRI_AwaitExtSensorData(
+  std::pair<Status, bool> GetDRI_AwaitExtSensorData(
       duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
@@ -1043,15 +1021,14 @@ struct MPU60X0 {
                           bool{res.second.dri_await_ext_sensor_data});
   }
 
-  inline std::pair<Status, bool> GetSlave3_FifoEnable(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetSlave3_FifoEnable(duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
 
     return std::make_pair(res.first, bool{res.second.enable_slave3_fifo});
   }
 
-  inline std::pair<Status, I2cMasterReadWriteTransition>
+  std::pair<Status, I2cMasterReadWriteTransition>
   GetI2cMasterReadWriteTransition(duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
@@ -1060,7 +1037,7 @@ struct MPU60X0 {
         res.first, I2cMasterReadWriteTransition{res.second.rw_transition});
   }
 
-  inline std::pair<Status, I2cMasterClockSpeed> GetI2cMasterClockSpeed(
+  std::pair<Status, I2cMasterClockSpeed> GetI2cMasterClockSpeed(
       duration_type timeout) noexcept {
     std::pair<Status, I2cMasterCtrlConfig> res =
         ReadI2cMasterCtrlConfig(timeout);
@@ -1094,13 +1071,13 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteInterruptPinConfig(InterruptPinConfig config,
-                                        duration_type timeout) noexcept {
+  Status WriteInterruptPinConfig(InterruptPinConfig config,
+                                 duration_type timeout) noexcept {
     return WriteByteAs_<InterruptPinConfig>(register_map::InterruptPinConfig,
                                             config, timeout);
   }
 
-  inline std::pair<Status, InterruptPinConfig> ReadInterruptPinConfig(
+  std::pair<Status, InterruptPinConfig> ReadInterruptPinConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<InterruptPinConfig>(register_map::InterruptPinConfig,
                                            timeout);
@@ -1111,20 +1088,20 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteInterruptEnableConfig(InterruptEnableConfig int_en_cfg,
-                                           duration_type timeout) noexcept {
+  Status WriteInterruptEnableConfig(InterruptEnableConfig int_en_cfg,
+                                    duration_type timeout) noexcept {
     return WriteByteAs_<InterruptEnableConfig>(register_map::InterruptEnable,
                                                int_en_cfg, timeout);
   }
 
-  inline std::pair<Status, InterruptEnableConfig> ReadInterruptEnableConfig(
+  std::pair<Status, InterruptEnableConfig> ReadInterruptEnableConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<InterruptEnableConfig>(register_map::InterruptEnable,
                                               timeout);
   }
 
-  inline Status SetFreeFallDetectionInterruptEnable(
-      bool enable, duration_type timeout) noexcept {
+  Status SetFreeFallDetectionInterruptEnable(bool enable,
+                                             duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
 
@@ -1133,8 +1110,8 @@ struct MPU60X0 {
     return WriteInterruptEnableConfig(res.second, timeout);
   }
 
-  inline Status SetMotionDetectionInterruptEnable(
-      bool enable, duration_type timeout) noexcept {
+  Status SetMotionDetectionInterruptEnable(bool enable,
+                                           duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
 
@@ -1144,8 +1121,8 @@ struct MPU60X0 {
     return WriteInterruptEnableConfig(res.second, timeout);
   }
 
-  inline Status SetZeroMotionDetectionInterruptEnable(
-      bool enable, duration_type timeout) noexcept {
+  Status SetZeroMotionDetectionInterruptEnable(bool enable,
+                                               duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
 
@@ -1154,8 +1131,8 @@ struct MPU60X0 {
     return WriteInterruptEnableConfig(res.second, timeout);
   }
 
-  inline Status SetFifoOverflowInterruptEnable(bool enable,
-                                               duration_type timeout) noexcept {
+  Status SetFifoOverflowInterruptEnable(bool enable,
+                                        duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
 
@@ -1165,8 +1142,8 @@ struct MPU60X0 {
     return WriteInterruptEnableConfig(res.second, timeout);
   }
 
-  inline Status SetI2cMasterInterruptEnable(bool enable,
-                                            duration_type timeout) noexcept {
+  Status SetI2cMasterInterruptEnable(bool enable,
+                                     duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
 
@@ -1176,8 +1153,8 @@ struct MPU60X0 {
     return WriteInterruptEnableConfig(res.second, timeout);
   }
 
-  inline Status SetDataReadyInterruptEnable(bool enable,
-                                            duration_type timeout) noexcept {
+  Status SetDataReadyInterruptEnable(bool enable,
+                                     duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
 
@@ -1187,7 +1164,7 @@ struct MPU60X0 {
     return WriteInterruptEnableConfig(res.second, timeout);
   }
 
-  inline std::pair<Status, bool> GetFreeFallDetectionInterruptEnable(
+  std::pair<Status, bool> GetFreeFallDetectionInterruptEnable(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
@@ -1195,7 +1172,7 @@ struct MPU60X0 {
                           bool{res.second.enable_freefall_detection_interrupt});
   }
 
-  inline std::pair<Status, bool> GetMotionDetectionInterruptEnable(
+  std::pair<Status, bool> GetMotionDetectionInterruptEnable(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
@@ -1203,7 +1180,7 @@ struct MPU60X0 {
                           bool{res.second.enable_motion_detection_interrupt});
   }
 
-  inline std::pair<Status, bool> GetZeroMotionDetectionInterruptEnable(
+  std::pair<Status, bool> GetZeroMotionDetectionInterruptEnable(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
@@ -1211,7 +1188,7 @@ struct MPU60X0 {
         res.first, bool{res.second.enable_zero_motion_detection_interrupt});
   }
 
-  inline std::pair<Status, bool> GetFifoOverflowInterruptEnable(
+  std::pair<Status, bool> GetFifoOverflowInterruptEnable(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
@@ -1219,7 +1196,7 @@ struct MPU60X0 {
                           bool{res.second.fifo_overflow_interrupt_enable});
   }
 
-  inline std::pair<Status, bool> GetI2cMasterInterruptEnable(
+  std::pair<Status, bool> GetI2cMasterInterruptEnable(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
@@ -1227,7 +1204,7 @@ struct MPU60X0 {
                           bool{res.second.i2c_master_interrupt_enable});
   }
 
-  inline std::pair<Status, bool> GetDataReadyInterruptEnable(
+  std::pair<Status, bool> GetDataReadyInterruptEnable(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptEnableConfig> res =
         ReadInterruptEnableConfig(timeout);
@@ -1240,37 +1217,37 @@ struct MPU60X0 {
    *
    **/
 
-  inline std::pair<Status, InterruptStatus> ReadInterruptStatus(
+  std::pair<Status, InterruptStatus> ReadInterruptStatus(
       duration_type timeout) noexcept {
     return ReadByteAs_<InterruptStatus>(register_map::InterruptStatus, timeout);
   }
 
-  inline std::pair<Status, bool> GetFreeFallDetectionInterruptState(
+  std::pair<Status, bool> GetFreeFallDetectionInterruptState(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.free_fall_detected});
   }
-  inline std::pair<Status, bool> GetMotionInterruptState(
+  std::pair<Status, bool> GetMotionInterruptState(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.motion_detected});
   }
-  inline std::pair<Status, bool> GetZeroMotionInterruptState(
+  std::pair<Status, bool> GetZeroMotionInterruptState(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.zero_motion_detected});
   }
-  inline std::pair<Status, bool> GetFifoOverflowInterruptState(
+  std::pair<Status, bool> GetFifoOverflowInterruptState(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.fifo_overflow});
   }
-  inline std::pair<Status, bool> GetI2cMasterInterruptState(
+  std::pair<Status, bool> GetI2cMasterInterruptState(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.i2c_master_interrupt});
   }
-  inline std::pair<Status, bool> GetDataReadyInterruptState(
+  std::pair<Status, bool> GetDataReadyInterruptState(
       duration_type timeout) noexcept {
     std::pair<Status, InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.data_ready});
@@ -1281,7 +1258,7 @@ struct MPU60X0 {
    *
    **/
 
-  inline std::pair<Status, int16_t> ReadAccelerometerX(
+  std::pair<Status, int16_t> ReadAccelerometerX(
       duration_type timeout) noexcept {
     int16_t data{};
     Status status =
@@ -1290,7 +1267,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
-  inline std::pair<Status, int16_t> ReadAccelerometerY(
+  std::pair<Status, int16_t> ReadAccelerometerY(
       duration_type timeout) noexcept {
     int16_t data{};
     Status status =
@@ -1299,7 +1276,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
-  inline std::pair<Status, int16_t> ReadAccelerometerZ(
+  std::pair<Status, int16_t> ReadAccelerometerZ(
       duration_type timeout) noexcept {
     int16_t data{};
     Status status =
@@ -1308,7 +1285,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
-  inline std::pair<Status, TriAxialData> ReadAccelerometer(
+  std::pair<Status, TriAxialData> ReadAccelerometer(
       duration_type timeout) noexcept {
     TriAxialData data{};
 
@@ -1319,7 +1296,7 @@ struct MPU60X0 {
     return std::make_pair(status, data);
   }
 
-  inline std::pair<Status, BiAxialData> ReadAccelerometerXY(
+  std::pair<Status, BiAxialData> ReadAccelerometerXY(
       duration_type timeout) noexcept {
     BiAxialData data{};
 
@@ -1329,7 +1306,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
-  inline std::pair<Status, BiAxialData> ReadAccelerometerYZ(
+  std::pair<Status, BiAxialData> ReadAccelerometerYZ(
       duration_type timeout) noexcept {
     BiAxialData data{};
 
@@ -1345,8 +1322,7 @@ struct MPU60X0 {
    *
    **/
 
-  inline std::pair<Status, int16_t> ReadTemperature(
-      duration_type timeout) noexcept {
+  std::pair<Status, int16_t> ReadTemperature(duration_type timeout) noexcept {
     int16_t data{};
 
     Status status =
@@ -1361,8 +1337,7 @@ struct MPU60X0 {
    *
    **/
 
-  inline std::pair<Status, int16_t> ReadGyroscopeX(
-      duration_type timeout) noexcept {
+  std::pair<Status, int16_t> ReadGyroscopeX(duration_type timeout) noexcept {
     int16_t data{};
     Status status =
         BurstRead_(register_map::GyroscopeX_OutH,
@@ -1370,8 +1345,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
-  inline std::pair<Status, int16_t> ReadGyroscopeY(
-      duration_type timeout) noexcept {
+  std::pair<Status, int16_t> ReadGyroscopeY(duration_type timeout) noexcept {
     int16_t data{};
     Status status =
         BurstRead_(register_map::GyroscopeY_OutH,
@@ -1379,8 +1353,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
-  inline std::pair<Status, int16_t> ReadGyroscopeZ(
-      duration_type timeout) noexcept {
+  std::pair<Status, int16_t> ReadGyroscopeZ(duration_type timeout) noexcept {
     int16_t data{};
     Status status =
         BurstRead_(register_map::GyroscopeZ_OutH,
@@ -1388,7 +1361,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
-  inline std::pair<Status, TriAxialData> ReadGyroscope(
+  std::pair<Status, TriAxialData> ReadGyroscope(
       duration_type timeout) noexcept {
     TriAxialData data{};
     Status status =
@@ -1398,7 +1371,7 @@ struct MPU60X0 {
     return std::make_pair(status, data);
   }
 
-  inline std::pair<Status, BiAxialData> ReadGyroscopeXY(
+  std::pair<Status, BiAxialData> ReadGyroscopeXY(
       duration_type timeout) noexcept {
     BiAxialData data{};
     Status status =
@@ -1407,7 +1380,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
-  inline std::pair<Status, BiAxialData> ReadGyroscopeYZ(
+  std::pair<Status, BiAxialData> ReadGyroscopeYZ(
       duration_type timeout) noexcept {
     BiAxialData data{};
     Status status =
@@ -1422,7 +1395,7 @@ struct MPU60X0 {
    *
    **/
 
-  inline std::pair<Status, uint8_t> ReadExternalSensorData(
+  std::pair<Status, uint8_t> ReadExternalSensorData(
       uint8_t sensor_data_index, duration_type timeout) noexcept {
     // TODO(lamarrr): find a better implementation with bound checking
     return ReadByte_(register_map::ExternalSensorData0 + sensor_data_index,
@@ -1434,12 +1407,12 @@ struct MPU60X0 {
    *
    **/
 
-  inline std::pair<Status, MotionDetectionStatus> ReadMotionDetectionStatus(
+  std::pair<Status, MotionDetectionStatus> ReadMotionDetectionStatus(
       duration_type timeout) noexcept {
     return ReadByteAs_<MotionDetectionStatus>(
         register_map::MotionDetectionStatus, timeout);
   }
-  inline std::pair<Status, bool> GetNegativeX_MotionDetected(
+  std::pair<Status, bool> GetNegativeX_MotionDetected(
       duration_type timeout) noexcept {
     std::pair<Status, MotionDetectionStatus> res =
         ReadByteAs_<MotionDetectionStatus>(register_map::MotionDetectionStatus,
@@ -1447,7 +1420,7 @@ struct MPU60X0 {
 
     return std::make_pair(res.first, bool{res.second.x_negative});
   }
-  inline std::pair<Status, bool> GetPositiveX_MotionDetected(
+  std::pair<Status, bool> GetPositiveX_MotionDetected(
       duration_type timeout) noexcept {
     std::pair<Status, MotionDetectionStatus> res =
         ReadByteAs_<MotionDetectionStatus>(register_map::MotionDetectionStatus,
@@ -1455,7 +1428,7 @@ struct MPU60X0 {
 
     return std::make_pair(res.first, bool{res.second.x_positive});
   }
-  inline std::pair<Status, bool> GetNegativeY_MotionDetected(
+  std::pair<Status, bool> GetNegativeY_MotionDetected(
       duration_type timeout) noexcept {
     std::pair<Status, MotionDetectionStatus> res =
         ReadByteAs_<MotionDetectionStatus>(register_map::MotionDetectionStatus,
@@ -1463,7 +1436,7 @@ struct MPU60X0 {
 
     return std::make_pair(res.first, bool{res.second.y_negative});
   }
-  inline std::pair<Status, bool> GetPositiveY_MotionDetected(
+  std::pair<Status, bool> GetPositiveY_MotionDetected(
       duration_type timeout) noexcept {
     std::pair<Status, MotionDetectionStatus> res =
         ReadByteAs_<MotionDetectionStatus>(register_map::MotionDetectionStatus,
@@ -1471,7 +1444,7 @@ struct MPU60X0 {
 
     return std::make_pair(res.first, bool{res.second.y_positive});
   }
-  inline std::pair<Status, bool> GetNegativeZ_MotionDetected(
+  std::pair<Status, bool> GetNegativeZ_MotionDetected(
       duration_type timeout) noexcept {
     std::pair<Status, MotionDetectionStatus> res =
         ReadByteAs_<MotionDetectionStatus>(register_map::MotionDetectionStatus,
@@ -1479,7 +1452,7 @@ struct MPU60X0 {
 
     return std::make_pair(res.first, bool{res.second.z_negative});
   }
-  inline std::pair<Status, bool> GetPositiveZ_MotionDetected(
+  std::pair<Status, bool> GetPositiveZ_MotionDetected(
       duration_type timeout) noexcept {
     std::pair<Status, MotionDetectionStatus> res =
         ReadByteAs_<MotionDetectionStatus>(register_map::MotionDetectionStatus,
@@ -1488,7 +1461,7 @@ struct MPU60X0 {
     return std::make_pair(res.first, bool{res.second.z_positive});
   }
 
-  inline std::pair<Status, bool> GetZeroMotionDetected(
+  std::pair<Status, bool> GetZeroMotionDetected(
       duration_type timeout) noexcept {
     std::pair<Status, MotionDetectionStatus> res =
         ReadByteAs_<MotionDetectionStatus>(register_map::MotionDetectionStatus,
@@ -1501,38 +1474,34 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteI2cSlave0_DataOut(uint8_t data,
-                                       duration_type timeout) noexcept {
+  Status WriteI2cSlave0_DataOut(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::I2cSlave0_DataOut, data, timeout);
   }
-  inline std::pair<Status, uint8_t> ReadI2cSlave0_DataOut(
+  std::pair<Status, uint8_t> ReadI2cSlave0_DataOut(
       duration_type timeout) noexcept {
     return ReadByte_(register_map::I2cSlave0_DataOut, timeout);
   }
 
-  inline Status WriteI2cSlave1_DataOut(uint8_t data,
-                                       duration_type timeout) noexcept {
+  Status WriteI2cSlave1_DataOut(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::I2cSlave1_DataOut, data, timeout);
   }
-  inline std::pair<Status, uint8_t> ReadI2cSlave1_DataOut(
+  std::pair<Status, uint8_t> ReadI2cSlave1_DataOut(
       duration_type timeout) noexcept {
     return ReadByte_(register_map::I2cSlave1_DataOut, timeout);
   }
 
-  inline Status WriteI2cSlave2_DataOut(uint8_t data,
-                                       duration_type timeout) noexcept {
+  Status WriteI2cSlave2_DataOut(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::I2cSlave2_DataOut, data, timeout);
   }
-  inline std::pair<Status, uint8_t> ReadI2cSlave2_DataOut(
+  std::pair<Status, uint8_t> ReadI2cSlave2_DataOut(
       duration_type timeout) noexcept {
     return ReadByte_(register_map::I2cSlave2_DataOut, timeout);
   }
 
-  inline Status WriteI2cSlave3_DataOut(uint8_t data,
-                                       duration_type timeout) noexcept {
+  Status WriteI2cSlave3_DataOut(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::I2cSlave3_DataOut, data, timeout);
   }
-  inline std::pair<Status, uint8_t> ReadI2cSlave3_DataOut(
+  std::pair<Status, uint8_t> ReadI2cSlave3_DataOut(
       duration_type timeout) noexcept {
     return ReadByte_(register_map::I2cSlave3_DataOut, timeout);
   }
@@ -1542,13 +1511,13 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteI2cMasterDelayCtrlConfig(I2cMasterDelayCtrlConfig ctrl_cfg,
-                                              duration_type timeout) noexcept {
+  Status WriteI2cMasterDelayCtrlConfig(I2cMasterDelayCtrlConfig ctrl_cfg,
+                                       duration_type timeout) noexcept {
     return WriteByteAs_<I2cMasterDelayCtrlConfig>(
         register_map::I2cMasterDelayControl, ctrl_cfg, timeout);
   }
-  inline std::pair<Status, I2cMasterDelayCtrlConfig>
-  ReadI2cMasterDelayCtrlConfig(duration_type timeout) noexcept {
+  std::pair<Status, I2cMasterDelayCtrlConfig> ReadI2cMasterDelayCtrlConfig(
+      duration_type timeout) noexcept {
     return ReadByteAs_<I2cMasterDelayCtrlConfig>(
         register_map::I2cMasterDelayControl, timeout);
   }
@@ -1558,19 +1527,19 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteSignalPathResetConfig(SignalPathResetConfig spr_cfg,
-                                           duration_type timeout) noexcept {
+  Status WriteSignalPathResetConfig(SignalPathResetConfig spr_cfg,
+                                    duration_type timeout) noexcept {
     return WriteByteAs_<SignalPathResetConfig>(register_map::SignalPathReset,
                                                spr_cfg, timeout);
   }
-  inline std::pair<Status, SignalPathResetConfig> ReadSignalPathResetConfig(
+  std::pair<Status, SignalPathResetConfig> ReadSignalPathResetConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<SignalPathResetConfig>(register_map::SignalPathReset,
                                               timeout);
   }
 
-  inline Status SetGyroscopeSignalPathReset(bool reset,
-                                            duration_type timeout) noexcept {
+  Status SetGyroscopeSignalPathReset(bool reset,
+                                     duration_type timeout) noexcept {
     std::pair<Status, SignalPathResetConfig> cfg =
         ReadSignalPathResetConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1578,8 +1547,8 @@ struct MPU60X0 {
     cfg.second.gyroscope_reset = reset;
     return WriteSignalPathResetConfig(cfg.second, timeout);
   }
-  inline Status SetAccelerometerSignalPathReset(
-      bool reset, duration_type timeout) noexcept {
+  Status SetAccelerometerSignalPathReset(bool reset,
+                                         duration_type timeout) noexcept {
     std::pair<Status, SignalPathResetConfig> cfg =
         ReadSignalPathResetConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1587,8 +1556,8 @@ struct MPU60X0 {
     cfg.second.accelerometer_reset = reset;
     return WriteSignalPathResetConfig(cfg.second, timeout);
   }
-  inline Status SetTemperatureSignalPathReset(bool reset,
-                                              duration_type timeout) noexcept {
+  Status SetTemperatureSignalPathReset(bool reset,
+                                       duration_type timeout) noexcept {
     std::pair<Status, SignalPathResetConfig> cfg =
         ReadSignalPathResetConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1597,21 +1566,21 @@ struct MPU60X0 {
     return WriteSignalPathResetConfig(cfg.second, timeout);
   }
 
-  inline std::pair<Status, bool> GetGyroscopeSignalPathReset(
+  std::pair<Status, bool> GetGyroscopeSignalPathReset(
       duration_type timeout) noexcept {
     std::pair<Status, SignalPathResetConfig> cfg =
         ReadSignalPathResetConfig(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.gyroscope_reset});
   }
-  inline std::pair<Status, bool> GetAccelerometerSignalPathReset(
+  std::pair<Status, bool> GetAccelerometerSignalPathReset(
       duration_type timeout) noexcept {
     std::pair<Status, SignalPathResetConfig> cfg =
         ReadSignalPathResetConfig(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.accelerometer_reset});
   }
-  inline std::pair<Status, bool> GetTemperatureSignalPathReset(
+  std::pair<Status, bool> GetTemperatureSignalPathReset(
       duration_type timeout) noexcept {
     std::pair<Status, SignalPathResetConfig> cfg =
         ReadSignalPathResetConfig(timeout);
@@ -1624,14 +1593,13 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteMotionDetectionCtrlConfig(MotionDetectionCtrlConfig cfg,
-                                               duration_type timeout) noexcept {
+  Status WriteMotionDetectionCtrlConfig(MotionDetectionCtrlConfig cfg,
+                                        duration_type timeout) noexcept {
     return WriteByteAs_<MotionDetectionCtrlConfig>(
         register_map::MotionDetectionControl, cfg, timeout);
   }
-  inline std::pair<Status, MotionDetectionCtrlConfig>
-  GetMotionDetectionCtrlConfig(MotionDetectionCtrlConfig,
-                               duration_type timeout) noexcept {
+  std::pair<Status, MotionDetectionCtrlConfig> GetMotionDetectionCtrlConfig(
+      MotionDetectionCtrlConfig, duration_type timeout) noexcept {
     return ReadByteAs_<MotionDetectionCtrlConfig>(
         register_map::MotionDetectionControl, timeout);
   }
@@ -1641,55 +1609,52 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteUserCtrlConfig(UserCtrlConfig cfg,
-                                    duration_type timeout) noexcept {
+  Status WriteUserCtrlConfig(UserCtrlConfig cfg,
+                             duration_type timeout) noexcept {
     return WriteByteAs_<UserCtrlConfig>(register_map::UserControl, cfg,
                                         timeout);
   }
-  inline std::pair<Status, UserCtrlConfig> ReadUserCtrlConfig(
+  std::pair<Status, UserCtrlConfig> ReadUserCtrlConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<UserCtrlConfig>(register_map::UserControl, timeout);
   }
 
-  inline Status SetFifoEnable(bool enable, duration_type timeout) noexcept {
+  Status SetFifoEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
     cfg.second.fifo_enable = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
-  inline Status SetI2cMasterEnable(bool enable,
-                                   duration_type timeout) noexcept {
+  Status SetI2cMasterEnable(bool enable, duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
     cfg.second.i2c_master_mode_enable = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
-  inline Status SetUseSpiInterface(bool enable,
-                                   duration_type timeout) noexcept {
+  Status SetUseSpiInterface(bool enable, duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
     cfg.second.enable_spi_interface = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
-  inline Status SetFifoReset(bool enable, duration_type timeout) noexcept {
+  Status SetFifoReset(bool enable, duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
     cfg.second.reset_fifo_buffer = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
-  inline Status SetI2cMasterReset(bool enable, duration_type timeout) noexcept {
+  Status SetI2cMasterReset(bool enable, duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
     cfg.second.reset_i2c_master = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
-  inline Status SetSignalPathReset(bool enable,
-                                   duration_type timeout) noexcept {
+  Status SetSignalPathReset(bool enable, duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     if (cfg.first != Status::OK) return cfg.first;
     cfg.second.clear_sensor_register_and_path = enable;
@@ -1697,31 +1662,27 @@ struct MPU60X0 {
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
 
-  inline std::pair<Status, bool> GetFifoEnable(duration_type timeout) noexcept {
+  std::pair<Status, bool> GetFifoEnable(duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.fifo_enable});
   }
-  inline std::pair<Status, bool> GetI2cMasterEnable(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetI2cMasterEnable(duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.i2c_master_mode_enable});
   }
-  inline std::pair<Status, bool> GetUseSpiInterface(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetUseSpiInterface(duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.enable_spi_interface});
   }
-  inline std::pair<Status, bool> GetFifoReset(duration_type timeout) noexcept {
+  std::pair<Status, bool> GetFifoReset(duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.reset_fifo_buffer});
   }
-  inline std::pair<Status, bool> GetI2cMasterReset(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetI2cMasterReset(duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.reset_i2c_master});
   }
-  inline std::pair<Status, bool> GetSignalPathReset(
-      duration_type timeout) noexcept {
+  std::pair<Status, bool> GetSignalPathReset(duration_type timeout) noexcept {
     std::pair<Status, UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first,
                           bool{cfg.second.clear_sensor_register_and_path});
@@ -1732,19 +1693,18 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WritePowerManagement1_Config(PowerManagement1_Config cfg,
-                                             duration_type timeout) noexcept {
+  Status WritePowerManagement1_Config(PowerManagement1_Config cfg,
+                                      duration_type timeout) noexcept {
     return WriteByteAs_<PowerManagement1_Config>(register_map::PowerManagement1,
                                                  cfg, timeout);
   }
-  inline std::pair<Status, PowerManagement1_Config> ReadPowerManagement1_Config(
+  std::pair<Status, PowerManagement1_Config> ReadPowerManagement1_Config(
       duration_type timeout) noexcept {
     return ReadByteAs_<PowerManagement1_Config>(register_map::PowerManagement1,
                                                 timeout);
   }
 
-  inline Status SetDeviceRegisterReset(bool reset,
-                                       duration_type timeout) noexcept {
+  Status SetDeviceRegisterReset(bool reset, duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
 
@@ -1754,7 +1714,7 @@ struct MPU60X0 {
 
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
-  inline Status SetSleep(bool sleep, duration_type timeout) noexcept {
+  Status SetSleep(bool sleep, duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
 
@@ -1764,7 +1724,7 @@ struct MPU60X0 {
 
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
-  inline Status SetSleepCycle(bool cycle, duration_type timeout) noexcept {
+  Status SetSleepCycle(bool cycle, duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
 
@@ -1774,8 +1734,7 @@ struct MPU60X0 {
 
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
-  inline Status SetTemperatureDisable(bool disable,
-                                      duration_type timeout) noexcept {
+  Status SetTemperatureDisable(bool disable, duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
 
@@ -1785,8 +1744,7 @@ struct MPU60X0 {
 
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
-  inline Status SetClockSource(ClockSource clk,
-                               duration_type timeout) noexcept {
+  Status SetClockSource(ClockSource clk, duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
 
@@ -1798,29 +1756,29 @@ struct MPU60X0 {
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
 
-  inline std::pair<Status, bool> GetDeviceRegisterReset(
+  std::pair<Status, bool> GetDeviceRegisterReset(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.reset_registers});
   }
-  inline std::pair<Status, bool> GetSleep(duration_type timeout) noexcept {
+  std::pair<Status, bool> GetSleep(duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.sleep_mode});
   }
-  inline std::pair<Status, bool> GetSleepCycle(duration_type timeout) noexcept {
+  std::pair<Status, bool> GetSleepCycle(duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.cycle_sleep});
   }
-  inline std::pair<Status, bool> GetTemperatureDisable(
+  std::pair<Status, bool> GetTemperatureDisable(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.disable_temperature});
   }
-  inline std::pair<Status, ClockSource> GetClockSource(
+  std::pair<Status, ClockSource> GetClockSource(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement1_Config> cfg =
         ReadPowerManagement1_Config(timeout);
@@ -1832,19 +1790,19 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WritePowerManagement2_Config(PowerManagement2_Config cfg,
-                                             duration_type timeout) noexcept {
+  Status WritePowerManagement2_Config(PowerManagement2_Config cfg,
+                                      duration_type timeout) noexcept {
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg, timeout);
   }
-  inline std::pair<Status, PowerManagement2_Config> ReadPowerManagement2_Config(
+  std::pair<Status, PowerManagement2_Config> ReadPowerManagement2_Config(
       duration_type timeout) noexcept {
     return ReadByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                 timeout);
   }
 
-  inline Status SetWakeupFrequency(WakeupFrequency wfreq,
-                                   duration_type timeout) noexcept {
+  Status SetWakeupFrequency(WakeupFrequency wfreq,
+                            duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1853,8 +1811,8 @@ struct MPU60X0 {
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
-  inline Status SetAccelerometerX_Standby(bool standby,
-                                          duration_type timeout) noexcept {
+  Status SetAccelerometerX_Standby(bool standby,
+                                   duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1862,8 +1820,8 @@ struct MPU60X0 {
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
-  inline Status SetAccelerometerY_Standby(bool standby,
-                                          duration_type timeout) noexcept {
+  Status SetAccelerometerY_Standby(bool standby,
+                                   duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1871,8 +1829,8 @@ struct MPU60X0 {
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
-  inline Status SetAccelerometerZ_Standby(bool standby,
-                                          duration_type timeout) noexcept {
+  Status SetAccelerometerZ_Standby(bool standby,
+                                   duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1880,8 +1838,7 @@ struct MPU60X0 {
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
-  inline Status SetGyroscopeX_Standby(bool standby,
-                                      duration_type timeout) noexcept {
+  Status SetGyroscopeX_Standby(bool standby, duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1889,8 +1846,7 @@ struct MPU60X0 {
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
-  inline Status SetGyroscopeY_Standby(bool standby,
-                                      duration_type timeout) noexcept {
+  Status SetGyroscopeY_Standby(bool standby, duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1898,8 +1854,7 @@ struct MPU60X0 {
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
-  inline Status SetGyroscopeZ_Standby(bool standby,
-                                      duration_type timeout) noexcept {
+  Status SetGyroscopeZ_Standby(bool standby, duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
     if (cfg.first != Status::OK) return cfg.first;
@@ -1908,7 +1863,7 @@ struct MPU60X0 {
                                                  cfg.second, timeout);
   }
 
-  inline std::pair<Status, WakeupFrequency> GetWakeupFrequency(
+  std::pair<Status, WakeupFrequency> GetWakeupFrequency(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
@@ -1916,42 +1871,42 @@ struct MPU60X0 {
     return std::make_pair(cfg.first,
                           WakeupFrequency{cfg.second.wakeup_frequency});
   }
-  inline std::pair<Status, bool> GetAccelerometerX_Standby(
+  std::pair<Status, bool> GetAccelerometerX_Standby(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.accelerometer_x_standby});
   }
-  inline std::pair<Status, bool> GetAccelerometerY_Standby(
+  std::pair<Status, bool> GetAccelerometerY_Standby(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.accelerometer_y_standby});
   }
-  inline std::pair<Status, bool> GetAccelerometerZ_Standby(
+  std::pair<Status, bool> GetAccelerometerZ_Standby(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.accelerometer_z_standby});
   }
-  inline std::pair<Status, bool> GetGyroscopeX_Standby(
+  std::pair<Status, bool> GetGyroscopeX_Standby(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.gyroscope_x_standby});
   }
-  inline std::pair<Status, bool> GetGyroscopeY_Standby(
+  std::pair<Status, bool> GetGyroscopeY_Standby(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.gyroscope_y_standby});
   }
-  inline std::pair<Status, bool> GetGyroscopeZ_Standby(
+  std::pair<Status, bool> GetGyroscopeZ_Standby(
       duration_type timeout) noexcept {
     std::pair<Status, PowerManagement2_Config> cfg =
         ReadPowerManagement2_Config(timeout);
@@ -1964,8 +1919,7 @@ struct MPU60X0 {
    *
    **/
 
-  inline std::pair<Status, uint16_t> ReadFifoCount(
-      duration_type timeout) noexcept {
+  std::pair<Status, uint16_t> ReadFifoCount(duration_type timeout) noexcept {
     uint16_t fifo_cnt{};
 
     Status status = BurstRead_(register_map::FifoCountH,
@@ -1979,11 +1933,10 @@ struct MPU60X0 {
    *
    **/
 
-  inline Status WriteFifoData(uint8_t data, duration_type timeout) noexcept {
+  Status WriteFifoData(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::FifoReadWrite, data, timeout);
   }
-  inline std::pair<Status, uint8_t> ReadFifoData(
-      duration_type timeout) noexcept {
+  std::pair<Status, uint8_t> ReadFifoData(duration_type timeout) noexcept {
     return ReadByte_(register_map::FifoReadWrite, timeout);
   }
 
@@ -1992,7 +1945,7 @@ struct MPU60X0 {
    *
    **/
 
-  inline std::pair<Status, uint8_t> ReadWhoAmI(duration_type timeout) noexcept {
+  std::pair<Status, uint8_t> ReadWhoAmI(duration_type timeout) noexcept {
     return ReadByte_(register_map::FifoReadWrite, timeout);
   }
 
