@@ -37,6 +37,7 @@
 #include <utility>
 
 extern "C" {
+// loads dependencies and device definitions for the peripherals
 #include "main.h"  // NOLINT
 
 #ifdef STM32F7
@@ -982,6 +983,7 @@ struct MPU60X0 {
     return WriteByteAs_<I2cMasterCtrlConfig>(register_map::I2cMasterCtrl,
                                              res.second, timeout);
   }
+
   Status SetI2cMasterClockSpeed(I2cMasterClockSpeed clock_speed,
                                 duration_type timeout) noexcept {
     Result<I2cMasterCtrlConfig> res = ReadI2cMasterCtrlConfig(timeout);
@@ -1198,22 +1200,27 @@ struct MPU60X0 {
     Result<InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.free_fall_detected});
   }
+
   Result<bool> GetMotionInterruptState(duration_type timeout) noexcept {
     Result<InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.motion_detected});
   }
+
   Result<bool> GetZeroMotionInterruptState(duration_type timeout) noexcept {
     Result<InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.zero_motion_detected});
   }
+
   Result<bool> GetFifoOverflowInterruptState(duration_type timeout) noexcept {
     Result<InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.fifo_overflow});
   }
+
   Result<bool> GetI2cMasterInterruptState(duration_type timeout) noexcept {
     Result<InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.i2c_master_interrupt});
   }
+
   Result<bool> GetDataReadyInterruptState(duration_type timeout) noexcept {
     Result<InterruptStatus> res = ReadInterruptStatus(timeout);
     return std::make_pair(res.first, bool{res.second.data_ready});
@@ -1232,6 +1239,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
+
   Result<int16_t> ReadAccelerometerY(duration_type timeout) noexcept {
     int16_t data{};
     Status status =
@@ -1240,6 +1248,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
+
   Result<int16_t> ReadAccelerometerZ(duration_type timeout) noexcept {
     int16_t data{};
     Status status =
@@ -1248,6 +1257,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
+
   Result<TriAxialData> ReadAccelerometer(duration_type timeout) noexcept {
     TriAxialData data{};
 
@@ -1267,6 +1277,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
+
   Result<BiAxialData> ReadAccelerometerYZ(duration_type timeout) noexcept {
     BiAxialData data{};
 
@@ -1305,6 +1316,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
+
   Result<int16_t> ReadGyroscopeY(duration_type timeout) noexcept {
     int16_t data{};
     Status status =
@@ -1313,6 +1325,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
+
   Result<int16_t> ReadGyroscopeZ(duration_type timeout) noexcept {
     int16_t data{};
     Status status =
@@ -1321,6 +1334,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
+
   Result<TriAxialData> ReadGyroscope(duration_type timeout) noexcept {
     TriAxialData data{};
     Status status =
@@ -1338,6 +1352,7 @@ struct MPU60X0 {
 
     return std::make_pair(status, data);
   }
+
   Result<BiAxialData> ReadGyroscopeYZ(duration_type timeout) noexcept {
     BiAxialData data{};
     Status status =
@@ -1369,6 +1384,7 @@ struct MPU60X0 {
     return ReadByteAs_<MotionDetectionStatus>(
         register_map::MotionDetectionStatus, timeout);
   }
+
   Result<bool> GetNegativeX_MotionDetected(duration_type timeout) noexcept {
     Result<MotionDetectionStatus> res = ReadByteAs_<MotionDetectionStatus>(
         register_map::MotionDetectionStatus, timeout);
@@ -1381,24 +1397,28 @@ struct MPU60X0 {
 
     return std::make_pair(res.first, bool{res.second.x_positive});
   }
+
   Result<bool> GetNegativeY_MotionDetected(duration_type timeout) noexcept {
     Result<MotionDetectionStatus> res = ReadByteAs_<MotionDetectionStatus>(
         register_map::MotionDetectionStatus, timeout);
 
     return std::make_pair(res.first, bool{res.second.y_negative});
   }
+
   Result<bool> GetPositiveY_MotionDetected(duration_type timeout) noexcept {
     Result<MotionDetectionStatus> res = ReadByteAs_<MotionDetectionStatus>(
         register_map::MotionDetectionStatus, timeout);
 
     return std::make_pair(res.first, bool{res.second.y_positive});
   }
+
   Result<bool> GetNegativeZ_MotionDetected(duration_type timeout) noexcept {
     Result<MotionDetectionStatus> res = ReadByteAs_<MotionDetectionStatus>(
         register_map::MotionDetectionStatus, timeout);
 
     return std::make_pair(res.first, bool{res.second.z_negative});
   }
+
   Result<bool> GetPositiveZ_MotionDetected(duration_type timeout) noexcept {
     Result<MotionDetectionStatus> res = ReadByteAs_<MotionDetectionStatus>(
         register_map::MotionDetectionStatus, timeout);
@@ -1420,6 +1440,7 @@ struct MPU60X0 {
   Status WriteI2cSlave0_DataOut(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::I2cSlave0_DataOut, data, timeout);
   }
+
   Result<uint8_t> ReadI2cSlave0_DataOut(duration_type timeout) noexcept {
     return ReadByte_(register_map::I2cSlave0_DataOut, timeout);
   }
@@ -1427,6 +1448,7 @@ struct MPU60X0 {
   Status WriteI2cSlave1_DataOut(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::I2cSlave1_DataOut, data, timeout);
   }
+
   Result<uint8_t> ReadI2cSlave1_DataOut(duration_type timeout) noexcept {
     return ReadByte_(register_map::I2cSlave1_DataOut, timeout);
   }
@@ -1434,6 +1456,7 @@ struct MPU60X0 {
   Status WriteI2cSlave2_DataOut(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::I2cSlave2_DataOut, data, timeout);
   }
+
   Result<uint8_t> ReadI2cSlave2_DataOut(duration_type timeout) noexcept {
     return ReadByte_(register_map::I2cSlave2_DataOut, timeout);
   }
@@ -1441,6 +1464,7 @@ struct MPU60X0 {
   Status WriteI2cSlave3_DataOut(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::I2cSlave3_DataOut, data, timeout);
   }
+
   Result<uint8_t> ReadI2cSlave3_DataOut(duration_type timeout) noexcept {
     return ReadByte_(register_map::I2cSlave3_DataOut, timeout);
   }
@@ -1455,6 +1479,7 @@ struct MPU60X0 {
     return WriteByteAs_<I2cMasterDelayCtrlConfig>(
         register_map::I2cMasterDelayControl, ctrl_cfg, timeout);
   }
+
   Result<I2cMasterDelayCtrlConfig> ReadI2cMasterDelayCtrlConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<I2cMasterDelayCtrlConfig>(
@@ -1471,6 +1496,7 @@ struct MPU60X0 {
     return WriteByteAs_<SignalPathResetConfig>(register_map::SignalPathReset,
                                                spr_cfg, timeout);
   }
+
   Result<SignalPathResetConfig> ReadSignalPathResetConfig(
       duration_type timeout) noexcept {
     return ReadByteAs_<SignalPathResetConfig>(register_map::SignalPathReset,
@@ -1486,6 +1512,7 @@ struct MPU60X0 {
     cfg.second.gyroscope_reset = reset;
     return WriteSignalPathResetConfig(cfg.second, timeout);
   }
+
   Status SetAccelerometerSignalPathReset(bool reset,
                                          duration_type timeout) noexcept {
     Result<SignalPathResetConfig> cfg = ReadSignalPathResetConfig(timeout);
@@ -1495,6 +1522,7 @@ struct MPU60X0 {
     cfg.second.accelerometer_reset = reset;
     return WriteSignalPathResetConfig(cfg.second, timeout);
   }
+
   Status SetTemperatureSignalPathReset(bool reset,
                                        duration_type timeout) noexcept {
     Result<SignalPathResetConfig> cfg = ReadSignalPathResetConfig(timeout);
@@ -1510,11 +1538,13 @@ struct MPU60X0 {
 
     return std::make_pair(cfg.first, bool{cfg.second.gyroscope_reset});
   }
+
   Result<bool> GetAccelerometerSignalPathReset(duration_type timeout) noexcept {
     Result<SignalPathResetConfig> cfg = ReadSignalPathResetConfig(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.accelerometer_reset});
   }
+
   Result<bool> GetTemperatureSignalPathReset(duration_type timeout) noexcept {
     Result<SignalPathResetConfig> cfg = ReadSignalPathResetConfig(timeout);
 
@@ -1531,6 +1561,7 @@ struct MPU60X0 {
     return WriteByteAs_<MotionDetectionCtrlConfig>(
         register_map::MotionDetectionControl, cfg, timeout);
   }
+
   Result<MotionDetectionCtrlConfig> GetMotionDetectionCtrlConfig(
       MotionDetectionCtrlConfig, duration_type timeout) noexcept {
     return ReadByteAs_<MotionDetectionCtrlConfig>(
@@ -1547,48 +1578,66 @@ struct MPU60X0 {
     return WriteByteAs_<UserCtrlConfig>(register_map::UserControl, cfg,
                                         timeout);
   }
+
   Result<UserCtrlConfig> ReadUserCtrlConfig(duration_type timeout) noexcept {
     return ReadByteAs_<UserCtrlConfig>(register_map::UserControl, timeout);
   }
 
   Status SetFifoEnable(bool enable, duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.fifo_enable = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
+
   Status SetI2cMasterEnable(bool enable, duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.i2c_master_mode_enable = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
+
   Status SetUseSpiInterface(bool enable, duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.enable_spi_interface = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
+
   Status SetFifoReset(bool enable, duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.reset_fifo_buffer = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
+
   Status SetI2cMasterReset(bool enable, duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.reset_i2c_master = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
   }
+
   Status SetSignalPathReset(bool enable, duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.clear_sensor_register_and_path = enable;
 
     return WriteUserCtrlConfig(cfg.second, timeout);
@@ -1598,22 +1647,27 @@ struct MPU60X0 {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.fifo_enable});
   }
+
   Result<bool> GetI2cMasterEnable(duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.i2c_master_mode_enable});
   }
+
   Result<bool> GetUseSpiInterface(duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.enable_spi_interface});
   }
+
   Result<bool> GetFifoReset(duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.reset_fifo_buffer});
   }
+
   Result<bool> GetI2cMasterReset(duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.reset_i2c_master});
   }
+
   Result<bool> GetSignalPathReset(duration_type timeout) noexcept {
     Result<UserCtrlConfig> cfg = ReadUserCtrlConfig(timeout);
     return std::make_pair(cfg.first,
@@ -1630,6 +1684,7 @@ struct MPU60X0 {
     return WriteByteAs_<PowerManagement1_Config>(register_map::PowerManagement1,
                                                  cfg, timeout);
   }
+
   Result<PowerManagement1_Config> ReadPowerManagement1_Config(
       duration_type timeout) noexcept {
     return ReadByteAs_<PowerManagement1_Config>(register_map::PowerManagement1,
@@ -1639,43 +1694,47 @@ struct MPU60X0 {
   Status SetDeviceRegisterReset(bool reset, duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
 
-    if (cfg.first != Status::OK) return cfg.first;
+    RETURN_F_IF_ERROR(cfg);
 
     cfg.second.reset_registers = reset;
 
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
+
   Status SetSleep(bool sleep, duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
 
-    if (cfg.first != Status::OK) return cfg.first;
+    RETURN_F_IF_ERROR(cfg);
 
     cfg.second.sleep_mode = sleep;
 
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
+
   Status SetSleepCycle(bool cycle, duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
 
-    if (cfg.first != Status::OK) return cfg.first;
+    RETURN_F_IF_ERROR(cfg);
 
     cfg.second.cycle_sleep = cycle;
 
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
+
   Status SetTemperatureDisable(bool disable, duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
 
-    if (cfg.first != Status::OK) return cfg.first;
+    RETURN_F_IF_ERROR(cfg);
 
     cfg.second.disable_temperature = disable;
 
     return WritePowerManagement1_Config(cfg.second, timeout);
   }
+
   Status SetClockSource(ClockSource clk, duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
 
-    if (cfg.first != Status::OK) return cfg.first;
+    RETURN_F_IF_ERROR(cfg);
 
     cfg.second.clock_source =
         static_cast<ClockSource>(static_cast<uint8_t>(clk) & 0b111U);
@@ -1687,18 +1746,22 @@ struct MPU60X0 {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.reset_registers});
   }
+
   Result<bool> GetSleep(duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.sleep_mode});
   }
+
   Result<bool> GetSleepCycle(duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.cycle_sleep});
   }
+
   Result<bool> GetTemperatureDisable(duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, bool{cfg.second.disable_temperature});
   }
+
   Result<ClockSource> GetClockSource(duration_type timeout) noexcept {
     Result<PowerManagement1_Config> cfg = ReadPowerManagement1_Config(timeout);
     return std::make_pair(cfg.first, ClockSource{cfg.second.clock_source});
@@ -1714,6 +1777,7 @@ struct MPU60X0 {
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg, timeout);
   }
+
   Result<PowerManagement2_Config> ReadPowerManagement2_Config(
       duration_type timeout) noexcept {
     return ReadByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
@@ -1723,53 +1787,73 @@ struct MPU60X0 {
   Status SetWakeupFrequency(WakeupFrequency wfreq,
                             duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.wakeup_frequency =
         static_cast<WakeupFrequency>(static_cast<uint8_t>(wfreq) & 0b11U);
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
+
   Status SetAccelerometerX_Standby(bool standby,
                                    duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.accelerometer_x_standby = standby;
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
+
   Status SetAccelerometerY_Standby(bool standby,
                                    duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.accelerometer_y_standby = standby;
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
+
   Status SetAccelerometerZ_Standby(bool standby,
                                    duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.accelerometer_z_standby = standby;
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
+
   Status SetGyroscopeX_Standby(bool standby, duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.gyroscope_x_standby = standby;
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
+
   Status SetGyroscopeY_Standby(bool standby, duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.gyroscope_y_standby = standby;
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
   }
+
   Status SetGyroscopeZ_Standby(bool standby, duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
-    if (cfg.first != Status::OK) return cfg.first;
+
+    RETURN_F_IF_ERROR(cfg);
+
     cfg.second.gyroscope_z_standby = standby;
     return WriteByteAs_<PowerManagement2_Config>(register_map::PowerManagement2,
                                                  cfg.second, timeout);
@@ -1781,31 +1865,37 @@ struct MPU60X0 {
     return std::make_pair(cfg.first,
                           WakeupFrequency{cfg.second.wakeup_frequency});
   }
+
   Result<bool> GetAccelerometerX_Standby(duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.accelerometer_x_standby});
   }
+
   Result<bool> GetAccelerometerY_Standby(duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.accelerometer_y_standby});
   }
+
   Result<bool> GetAccelerometerZ_Standby(duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.accelerometer_z_standby});
   }
+
   Result<bool> GetGyroscopeX_Standby(duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.gyroscope_x_standby});
   }
+
   Result<bool> GetGyroscopeY_Standby(duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
 
     return std::make_pair(cfg.first, bool{cfg.second.gyroscope_y_standby});
   }
+
   Result<bool> GetGyroscopeZ_Standby(duration_type timeout) noexcept {
     Result<PowerManagement2_Config> cfg = ReadPowerManagement2_Config(timeout);
 
@@ -1834,6 +1924,7 @@ struct MPU60X0 {
   Status WriteFifoData(uint8_t data, duration_type timeout) noexcept {
     return WriteByte_(register_map::FifoReadWrite, data, timeout);
   }
+
   Result<uint8_t> ReadFifoData(duration_type timeout) noexcept {
     return ReadByte_(register_map::FifoReadWrite, timeout);
   }
