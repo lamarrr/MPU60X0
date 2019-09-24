@@ -1232,60 +1232,70 @@ struct MPU60X0 {
    **/
 
   Result<int16_t> ReadAccelerometerX(duration_type timeout) noexcept {
-    int16_t data{};
-    Status status =
-        BurstRead_(register_map::AccelerometerX_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
-
-    return std::make_pair(status, data);
+    uint8_t data[2]{};
+    Status status = BurstRead_(register_map::AccelerometerX_OutH, data,
+                               sizeof(data), timeout);
+    int16_t a_x =
+        (static_cast<int16_t>(data[0]) << 8) | (static_cast<int16_t>(data[1]));
+    return std::make_pair(status, a_x);
   }
 
   Result<int16_t> ReadAccelerometerY(duration_type timeout) noexcept {
-    int16_t data{};
-    Status status =
-        BurstRead_(register_map::AccelerometerY_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
+    uint8_t data[2]{};
 
-    return std::make_pair(status, data);
+    Status status = BurstRead_(register_map::AccelerometerY_OutH, data,
+                               sizeof(data), timeout);
+    int16_t a_y =
+        (static_cast<int16_t>(data[0]) << 8) | (static_cast<int16_t>(data[1]));
+    return std::make_pair(status, a_y);
   }
 
   Result<int16_t> ReadAccelerometerZ(duration_type timeout) noexcept {
-    int16_t data{};
-    Status status =
-        BurstRead_(register_map::AccelerometerZ_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
+    uint8_t data[2]{};
+    Status status = BurstRead_(register_map::AccelerometerZ_OutH, data,
+                               sizeof(data), timeout);
+    int16_t a_z =
+        (static_cast<int16_t>(data[0]) << 8) | (static_cast<int16_t>(data[1]));
 
-    return std::make_pair(status, data);
+    return std::make_pair(status, a_z);
   }
 
   Result<TriAxialData> ReadAccelerometer(duration_type timeout) noexcept {
-    TriAxialData data{};
-
-    Status status =
-        BurstRead_(register_map::AccelerometerX_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
-
-    return std::make_pair(status, data);
+    uint8_t data[2 * 3];
+    Status status = BurstRead_(register_map::AccelerometerX_OutH, data,
+                               sizeof(data), timeout);
+    TriAxialData a{.x = (static_cast<int16_t>(data[0]) << 8) |
+                        (static_cast<int16_t>(data[1])),
+                   .y = (static_cast<int16_t>(data[2]) << 8) |
+                        (static_cast<int16_t>(data[3])),
+                   .z = (static_cast<int16_t>(data[4]) << 8) |
+                        (static_cast<int16_t>(data[5]))};
+    return std::make_pair(status, a);
   }
 
   Result<BiAxialData> ReadAccelerometerXY(duration_type timeout) noexcept {
-    BiAxialData data{};
+    uint8_t data[2 * 2]{};
 
-    Status status =
-        BurstRead_(register_map::AccelerometerX_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
-
-    return std::make_pair(status, data);
+    Status status = BurstRead_(register_map::AccelerometerX_OutH, data,
+                               sizeof(data), timeout);
+    TriAxialData a_xy{.a = (static_cast<int16_t>(data[0]) << 8) |
+                           (static_cast<int16_t>(data[1])),
+                      .b = (static_cast<int16_t>(data[1]) << 8) |
+                           (static_cast<int16_t>(data[2]))};
+    return std::make_pair(status, a_xy);
   }
 
   Result<BiAxialData> ReadAccelerometerYZ(duration_type timeout) noexcept {
-    BiAxialData data{};
+    uint8_t data[2 * 2]{};
 
-    Status status =
-        BurstRead_(register_map::AccelerometerY_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
+    Status status = BurstRead_(register_map::AccelerometerY_OutH, data,
+                               sizeof(data), timeout);
+    TriAxialData a_yz{.a = (static_cast<int16_t>(data[0]) << 8) |
+                           (static_cast<int16_t>(data[1])),
+                      .b = (static_cast<int16_t>(data[1]) << 8) |
+                           (static_cast<int16_t>(data[2]))};
 
-    return std::make_pair(status, data);
+    return std::make_pair(status, a_yz);
   }
 
   /**
@@ -1294,13 +1304,15 @@ struct MPU60X0 {
    **/
 
   Result<int16_t> ReadTemperature(duration_type timeout) noexcept {
-    int16_t data{};
+    uint8_t data[2]{};
 
     Status status =
-        BurstRead_(register_map::TemperatureOutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
+        BurstRead_(register_map::TemperatureOutH, data, sizeof(data), timeout);
 
-    return std::make_pair(status, data);
+    int16_t temp =
+        (static_cast<int16_t>(data[0]) << 8) | (static_cast<int16_t>(data[1]));
+
+    return std::make_pair(status, temp);
   }
 
   /**
@@ -1309,57 +1321,69 @@ struct MPU60X0 {
    **/
 
   Result<int16_t> ReadGyroscopeX(duration_type timeout) noexcept {
-    int16_t data{};
+    uint8_t data[2]{};
     Status status =
-        BurstRead_(register_map::GyroscopeX_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
-
-    return std::make_pair(status, data);
+        BurstRead_(register_map::GyroscopeX_OutH, data, sizeof(data), timeout);
+    int16_t gx =
+        (static_cast<int16_t>(data[0]) << 8) | (static_cast<int16_t>(data[1]));
+    return std::make_pair(status, gx);
   }
 
   Result<int16_t> ReadGyroscopeY(duration_type timeout) noexcept {
-    int16_t data{};
+    uint8_t data[2]{};
     Status status =
-        BurstRead_(register_map::GyroscopeY_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
+        BurstRead_(register_map::GyroscopeY_OutH, data, sizeof(data), timeout);
+    int16_t gy =
+        (static_cast<int16_t>(data[0]) << 8) | (static_cast<int16_t>(data[1]));
 
-    return std::make_pair(status, data);
+    return std::make_pair(status, gy);
   }
 
   Result<int16_t> ReadGyroscopeZ(duration_type timeout) noexcept {
-    int16_t data{};
+    uint8_t data[2]{};
     Status status =
-        BurstRead_(register_map::GyroscopeZ_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
+        BurstRead_(register_map::GyroscopeZ_OutH, data, sizeof(data), timeout);
+    int16_t gz =
+        (static_cast<int16_t>(data[0]) << 8) | (static_cast<int16_t>(data[1]));
 
-    return std::make_pair(status, data);
+    return std::make_pair(status, gz);
   }
 
   Result<TriAxialData> ReadGyroscope(duration_type timeout) noexcept {
-    TriAxialData data{};
+    uint8_t data[2 * 3]{};
     Status status =
-        BurstRead_(register_map::GyroscopeX_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
-
-    return std::make_pair(status, data);
+        BurstRead_(register_map::GyroscopeX_OutH, data, sizeof(data), timeout);
+    TriAxialData g{.x = (static_cast<int16_t>(data[0]) << 8) |
+                        (static_cast<int16_t>(data[1])),
+                   .y = (static_cast<int16_t>(data[2]) << 8) |
+                        (static_cast<int16_t>(data[3])),
+                   .z = (static_cast<int16_t>(data[4]) << 8) |
+                        (static_cast<int16_t>(data[5]))};
+    return std::make_pair(status, g);
   }
 
   Result<BiAxialData> ReadGyroscopeXY(duration_type timeout) noexcept {
-    BiAxialData data{};
+    uint8_t data[2 * 2]{};
     Status status =
-        BurstRead_(register_map::GyroscopeX_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
+        BurstRead_(register_map::GyroscopeX_OutH, data, sizeof(data), timeout);
+    BiAxialData xy{.a = (static_cast<int16_t>(data[0]) << 8) |
+                        (static_cast<int16_t>(data[1])),
+                   .b = (static_cast<int16_t>(data[1]) << 8) |
+                        (static_cast<int16_t>(data[2]))};
 
-    return std::make_pair(status, data);
+    return std::make_pair(status, xy);
   }
 
   Result<BiAxialData> ReadGyroscopeYZ(duration_type timeout) noexcept {
-    BiAxialData data{};
+    uint8_t data[2 * 2]{};
     Status status =
-        BurstRead_(register_map::GyroscopeY_OutH,
-                   reinterpret_cast<uint8_t*>(&data), sizeof(data), timeout);
+        BurstRead_(register_map::GyroscopeY_OutH, data, sizeof(data), timeout);
+    BiAxialData yz{.a = (static_cast<int16_t>(data[0]) << 8) |
+                        (static_cast<int16_t>(data[1])),
+                   .b = (static_cast<int16_t>(data[1]) << 8) |
+                        (static_cast<int16_t>(data[2]))};
 
-    return std::make_pair(status, data);
+    return std::make_pair(status, yz);
   }
 
   /**
@@ -1908,11 +1932,13 @@ struct MPU60X0 {
    **/
 
   Result<uint16_t> ReadFifoCount(duration_type timeout) noexcept {
-    uint16_t fifo_cnt{};
+    uint8_t data[2]{};
 
-    Status status = BurstRead_(register_map::FifoCountH,
-                               reinterpret_cast<uint8_t*>(&fifo_cnt),
-                               sizeof(fifo_cnt), timeout);
+    Status status =
+        BurstRead_(register_map::FifoCountH, data, sizeof(data), timeout);
+
+    uint16_t fifo_cnt = (static_cast<uint16_t>(data[0]) << 8) |
+                        (static_cast<uint16_t>(data[1]));
     return std::make_pair(status, fifo_cnt);
   }
 
