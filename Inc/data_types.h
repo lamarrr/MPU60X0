@@ -34,18 +34,17 @@
 
 namespace mpu60X0 {
 
-// reverse-order struct packing
 struct TriAxialData {
-  int16_t z;
-  int16_t y;
   int16_t x;
+  int16_t y;
+  int16_t z;
 };
 
-// reverse-order struct packing
 struct BiAxialData {
-  int16_t b;
   int16_t a;
+  int16_t b;
 };
 
-};      // namespace mpu60X0
+};  // namespace mpu60X0
+// namespace mpu60X0
 #endif  // DRIVERS_MPU60X0_DATA_TYPES_H_

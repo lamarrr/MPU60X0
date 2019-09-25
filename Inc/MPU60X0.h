@@ -1264,12 +1264,13 @@ struct MPU60X0 {
     uint8_t data[2 * 3];
     Status status = BurstRead_(register_map::AccelerometerX_OutH, data,
                                sizeof(data), timeout);
-    TriAxialData a{.x = (static_cast<int16_t>(data[0]) << 8) |
-                        (static_cast<int16_t>(data[1])),
-                   .y = (static_cast<int16_t>(data[2]) << 8) |
-                        (static_cast<int16_t>(data[3])),
-                   .z = (static_cast<int16_t>(data[4]) << 8) |
-                        (static_cast<int16_t>(data[5]))};
+    TriAxialData a;
+    a.x = (static_cast<int16_t>(data[0]) << 8) |
+                        (static_cast<int16_t>(data[1]));
+    a .y = (static_cast<int16_t>(data[2]) << 8) |
+                        (static_cast<int16_t>(data[3]));
+    a.z = (static_cast<int16_t>(data[4]) << 8) |
+                        (static_cast<int16_t>(data[5]));
     return std::make_pair(status, a);
   }
 
@@ -1278,10 +1279,11 @@ struct MPU60X0 {
 
     Status status = BurstRead_(register_map::AccelerometerX_OutH, data,
                                sizeof(data), timeout);
-    TriAxialData a_xy{.a = (static_cast<int16_t>(data[0]) << 8) |
+    BiAxialData a_xy;
+    a_xy.a = (static_cast<int16_t>(data[0]) << 8) |
                            (static_cast<int16_t>(data[1])),
-                      .b = (static_cast<int16_t>(data[1]) << 8) |
-                           (static_cast<int16_t>(data[2]))};
+    a_xy.b = (static_cast<int16_t>(data[1]) << 8) |
+                           (static_cast<int16_t>(data[2]));
     return std::make_pair(status, a_xy);
   }
 
@@ -1290,10 +1292,11 @@ struct MPU60X0 {
 
     Status status = BurstRead_(register_map::AccelerometerY_OutH, data,
                                sizeof(data), timeout);
-    TriAxialData a_yz{.a = (static_cast<int16_t>(data[0]) << 8) |
-                           (static_cast<int16_t>(data[1])),
-                      .b = (static_cast<int16_t>(data[1]) << 8) |
-                           (static_cast<int16_t>(data[2]))};
+    BiAxialData a_yz;
+    a_yz.a = (static_cast<int16_t>(data[0]) << 8) |
+                           (static_cast<int16_t>(data[1]));
+    a_yz.b = (static_cast<int16_t>(data[1]) << 8) |
+                           (static_cast<int16_t>(data[2]));
 
     return std::make_pair(status, a_yz);
   }
@@ -1353,12 +1356,13 @@ struct MPU60X0 {
     uint8_t data[2 * 3]{};
     Status status =
         BurstRead_(register_map::GyroscopeX_OutH, data, sizeof(data), timeout);
-    TriAxialData g{.x = (static_cast<int16_t>(data[0]) << 8) |
-                        (static_cast<int16_t>(data[1])),
-                   .y = (static_cast<int16_t>(data[2]) << 8) |
-                        (static_cast<int16_t>(data[3])),
-                   .z = (static_cast<int16_t>(data[4]) << 8) |
-                        (static_cast<int16_t>(data[5]))};
+    TriAxialData g;
+    g.x = (static_cast<int16_t>(data[0]) << 8) |
+                        (static_cast<int16_t>(data[1]));
+    g.y = (static_cast<int16_t>(data[2]) << 8) |
+                        (static_cast<int16_t>(data[3]));
+    g.z = (static_cast<int16_t>(data[4]) << 8) |
+                        (static_cast<int16_t>(data[5]));
     return std::make_pair(status, g);
   }
 
@@ -1366,10 +1370,11 @@ struct MPU60X0 {
     uint8_t data[2 * 2]{};
     Status status =
         BurstRead_(register_map::GyroscopeX_OutH, data, sizeof(data), timeout);
-    BiAxialData xy{.a = (static_cast<int16_t>(data[0]) << 8) |
-                        (static_cast<int16_t>(data[1])),
-                   .b = (static_cast<int16_t>(data[1]) << 8) |
-                        (static_cast<int16_t>(data[2]))};
+    BiAxialData xy;
+    xy.a = (static_cast<int16_t>(data[0]) << 8) |
+                        (static_cast<int16_t>(data[1]));
+    xy.b = (static_cast<int16_t>(data[1]) << 8) |
+                        (static_cast<int16_t>(data[2]));
 
     return std::make_pair(status, xy);
   }
@@ -1378,10 +1383,11 @@ struct MPU60X0 {
     uint8_t data[2 * 2]{};
     Status status =
         BurstRead_(register_map::GyroscopeY_OutH, data, sizeof(data), timeout);
-    BiAxialData yz{.a = (static_cast<int16_t>(data[0]) << 8) |
-                        (static_cast<int16_t>(data[1])),
-                   .b = (static_cast<int16_t>(data[1]) << 8) |
-                        (static_cast<int16_t>(data[2]))};
+    BiAxialData yz;
+    yz.a = (static_cast<int16_t>(data[0]) << 8) |
+                        (static_cast<int16_t>(data[1]));
+    yz.b = (static_cast<int16_t>(data[1]) << 8) |
+                        (static_cast<int16_t>(data[2]));
 
     return std::make_pair(status, yz);
   }

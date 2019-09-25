@@ -75,10 +75,10 @@ struct Config {
 MPU_SIZE_CASSERT(Config);
 
 enum struct GyroscopeFullScale : uint8_t {
-  Dps250 = 0U,
-  Dps500 = 1U,
-  Dps1000 = 2U,
-  Dps2000 = 3U,
+  DegPs250 = 0U,
+  DegPs500 = 1U,
+  DegPs1000 = 2U,
+  DegPs2000 = 3U,
 };
 
 struct GyroscopeConfig {
